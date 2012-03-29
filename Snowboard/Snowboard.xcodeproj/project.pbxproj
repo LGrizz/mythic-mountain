@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		272134AA1523FA9D00713A11 /* dead-tree.png in Resources */ = {isa = PBXBuildFile; fileRef = 272134A91523FA9D00713A11 /* dead-tree.png */; };
 		27B4AD341523D87400F6D9F2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B4AD331523D87400F6D9F2 /* QuartzCore.framework */; };
 		27B4AD361523D87400F6D9F2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B4AD351523D87400F6D9F2 /* OpenGLES.framework */; };
 		27B4AD381523D87400F6D9F2 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B4AD371523D87400F6D9F2 /* OpenAL.framework */; };
@@ -145,6 +146,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		272134A91523FA9D00713A11 /* dead-tree.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dead-tree.png"; sourceTree = "<group>"; };
 		27B4AD2F1523D87400F6D9F2 /* Snowboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Snowboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B4AD331523D87400F6D9F2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		27B4AD351523D87400F6D9F2 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -422,6 +424,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		272134A41523F86000713A11 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				272134A91523FA9D00713A11 /* dead-tree.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		27B4AD241523D87400F6D9F2 = {
 			isa = PBXGroup;
 			children = (
@@ -474,6 +484,7 @@
 		27B4AD441523D87400F6D9F2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				272134A41523F86000713A11 /* Images */,
 				27D78DCD1523DA3600B15A3A /* Backgrounds */,
 				27D78DD31523DA3600B15A3A /* Classes */,
 				27D78DD61523DA3600B15A3A /* Fonts */,
@@ -946,6 +957,7 @@
 				27D78DF91523DA3600B15A3A /* SpaceGame.caf in Resources */,
 				27D78DFA1523DA3600B15A3A /* Sprites.plist in Resources */,
 				27D78DFB1523DA3600B15A3A /* Sprites.pvr.ccz in Resources */,
+				272134AA1523FA9D00713A11 /* dead-tree.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
