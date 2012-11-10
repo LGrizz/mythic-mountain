@@ -22,16 +22,13 @@ typedef enum {
     CCSprite *_ship;
     
     CCParallaxNode *_backgroundNode;
-    CCSprite *_spacedust1;
-    CCSprite *_spacedust2;
-    CCSprite *_planetsunrise;
-    CCSprite *_galaxy;
-    CCSprite *_spacialanomaly;
-    CCSprite *_spacialanomaly2;
+    CCSprite *_background1;
+    CCSprite *_background2;
+    CCSprite *_startLine;
     float _shipPointsPerSecY;
     float _shipPointsPerSecZ;
     
-    CCArray *_asteroids;
+    CCArray *_trees;
     int _nextAsteroid;
     double _nextAsteroidSpawn;
     
@@ -39,6 +36,14 @@ typedef enum {
     
     double _gameOverTime;
     bool _gameOver;
+    
+    bool _started;
+    
+    
+    ARCH_OPTIMAL_PARTICLE_SYSTEM *trail;
+    
+    float _backgroundSpeed; 
+    float _randDuration;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child

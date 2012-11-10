@@ -11,7 +11,7 @@
 #import "HelloWorldLayer.h"
 #import "CCParallaxNode-Extras.h"
 
-#define kNumAsteroids 4
+#define kNumTrees 6
 
 // HelloWorldLayer implementation
 @implementation HelloWorldLayer
@@ -36,60 +36,64 @@
 {
     if( (self=[super init])) {
         
-        _batchNode = [CCSpriteBatchNode batchNodeWithFile:@"Sprites.pvr.ccz"]; // 1
-        [self addChild:_batchNode]; // 2
-        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"Sprites.plist"]; // 3
-        
-        _ship = [CCSprite spriteWithSpriteFrameName:@"SpaceFlier_sm_1.png"];  // 4
+        _started = NO;
+        self.isTouchEnabled = YES;
+        _ship = [CCSprite spriteWithFile:@"penguin-right.png"];  // 4
         CGSize winSize = [CCDirector sharedDirector].winSize; // 5
-        _ship.position = ccp(winSize.width * 0.1, winSize.height * 0.5); // 6
-        [_batchNode addChild:_ship z:1]; // 7
+        _ship.position = ccp(winSize.width * 0.5, winSize.height * 0.72); // 6
+        [self addChild:_ship z:1];
+        
+        _startLine = [CCSprite spriteWithFile:@"startLineGate.png"];
+        _startLine.position = ccp(winSize.width/2, winSize.height-_startLine.contentSize.height/2);
+        [self addChild:_startLine];
+        //[_batchNode addChild:_ship z:1]; // 7
         
         // 1) Create the CCParallaxNode
         _backgroundNode = [CCParallaxNode node];
         [self addChild:_backgroundNode z:-1];
         
         // 2) Create the sprites we'll add to the CCParallaxNode
-        _spacedust1 = [CCSprite spriteWithFile:@"bg_front_spacedust.png"];
-        _spacedust2 = [CCSprite spriteWithFile:@"bg_front_spacedust.png"];
-        _planetsunrise = [CCSprite spriteWithFile:@"bg_planetsunrise.png"];
-        _galaxy = [CCSprite spriteWithFile:@"bg_galaxy.png"];
-        _spacialanomaly = [CCSprite spriteWithFile:@"bg_spacialanomaly.png"];
-        _spacialanomaly2 = [CCSprite spriteWithFile:@"bg_spacialanomaly2.png"];
+        _background1 = [CCSprite spriteWithFile:@"bluesnow.png"];
+        _background2 = [CCSprite spriteWithFile:@"bluesnow.png"];
         
         // 3) Determine relative movement speeds for space dust and background
-        CGPoint dustSpeed = ccp(0.1, 0.1);
+        CGPoint dustSpeed = ccp(0, 0.3);
         CGPoint bgSpeed = ccp(0.05, 0.05);
         
         // 4) Add children to CCParallaxNode
-        [_backgroundNode addChild:_spacedust1 z:0 parallaxRatio:dustSpeed positionOffset:ccp(0,winSize.height/2)];
-        [_backgroundNode addChild:_spacedust2 z:0 parallaxRatio:dustSpeed positionOffset:ccp(_spacedust1.contentSize.width,winSize.height/2)];        
-        [_backgroundNode addChild:_galaxy z:-1 parallaxRatio:bgSpeed positionOffset:ccp(0,winSize.height * 0.7)];
-        [_backgroundNode addChild:_planetsunrise z:-1 parallaxRatio:bgSpeed positionOffset:ccp(600,winSize.height * 0)];        
-        [_backgroundNode addChild:_spacialanomaly z:-1 parallaxRatio:bgSpeed positionOffset:ccp(900,winSize.height * 0.3)];        
-        [_backgroundNode addChild:_spacialanomaly2 z:-1 parallaxRatio:bgSpeed positionOffset:ccp(1500,winSize.height * 0.9)];
+        [_backgroundNode addChild:_background1 z:0 parallaxRatio:dustSpeed positionOffset:ccp(winSize.width/2,0)];
+        [_backgroundNode addChild:_background2 z:0 parallaxRatio:dustSpeed positionOffset:ccp(winSize.width/2,-(_background1.contentSize.height))]; 
         
-        NSArray *starsArray = [NSArray arrayWithObjects:@"Stars1.plist", @"Stars2.plist", @"Stars3.plist", nil];
-        for(NSString *stars in starsArray) {        
-            CCParticleSystemQuad *starsEffect = [CCParticleSystemQuad particleWithFile:stars];        
-            [self addChild:starsEffect z:1];
-        }
+        _backgroundSpeed = 1000;
+        _randDuration = 2.4;
+        
+        CCParticleSystemQuad *snowEffect = [CCParticleSystemQuad particleWithFile:@"snow.plist"];
+        //[self addChild:snowEffect];
         
         self.isAccelerometerEnabled = YES;
         
-        _asteroids = [[CCArray alloc] initWithCapacity:kNumAsteroids];
-        for(int i = 0; i < kNumAsteroids; ++i) {
-            CCSprite *asteroid = [CCSprite spriteWithFile:@"dead-tree.png"];
-            asteroid.visible = NO;
-            [self addChild:asteroid];
-            [_asteroids addObject:asteroid];
+        _trees = [[CCArray alloc] initWithCapacity:kNumTrees];
+        for(int i = 0; i < kNumTrees; ++i) {
+            CCSprite *tree;
+            if(i%2 == 0){
+                tree = [CCSprite spriteWithFile:@"dead-tree.png"];
+            }else{
+                tree = [CCSprite spriteWithFile:@"trees-evergreen.png"];
+            }
+            tree.visible = NO;
+            [self addChild:tree];
+            [_trees addObject:tree];
         }
         
         _lives = 3;
         double curTime = CACurrentMediaTime();
         _gameOverTime = curTime + 30.0;
         
-        [self scheduleUpdate];
+        trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail2.plist"];
+        trail.positionType=kCCPositionTypeFree;
+		trail.position=ccp(_ship.position.x, _ship.position.y-20);
+        
+        //[self scheduleUpdate];
     }
     return self;
 }
@@ -99,74 +103,58 @@
 }
 
 - (void)update:(ccTime)dt {
-    CGPoint backgroundScrollVel = ccp(-1000, 0);
+    CGPoint backgroundScrollVel = ccp(0, _backgroundSpeed);
     _backgroundNode.position = ccpAdd(_backgroundNode.position, ccpMult(backgroundScrollVel, dt));
     
-    NSArray *spaceDusts = [NSArray arrayWithObjects:_spacedust1, _spacedust2, nil];
+    NSArray *spaceDusts = [NSArray arrayWithObjects:_background1, _background2, nil];
     for (CCSprite *spaceDust in spaceDusts) {
-        if ([_backgroundNode convertToWorldSpace:spaceDust.position].x < -spaceDust.contentSize.width) {
-            [_backgroundNode incrementOffset:ccp(2*spaceDust.contentSize.width,0) forChild:spaceDust];
-        }
-    }
-    
-    NSArray *backgrounds = [NSArray arrayWithObjects:_planetsunrise, _galaxy, _spacialanomaly, _spacialanomaly2, nil];
-    for (CCSprite *background in backgrounds) {
-        if ([_backgroundNode convertToWorldSpace:background.position].x < -background.contentSize.width) {
-            [_backgroundNode incrementOffset:ccp(2000,0) forChild:background];
+        if ([_backgroundNode convertToWorldSpace:spaceDust.position].y > spaceDust.contentSize.height) {
+            [_backgroundNode incrementOffset:ccp(0,-(2*spaceDust.contentSize.height)) forChild:spaceDust];
         }
     }
     
     CGSize winSize = [CCDirector sharedDirector].winSize;
-    float maxY = winSize.height - _ship.contentSize.height/2;
-    float minY = _ship.contentSize.height/2;
-    
-    float newY = _ship.position.y + (_shipPointsPerSecY * dt);
-    newY = MIN(MAX(newY, minY), maxY);
-    
     float maxX = winSize.width - _ship.contentSize.width/2;
     float minX = _ship.contentSize.width/2;
     
-    float newX = _ship.position.x + (_shipPointsPerSecZ * dt);
+    float newX = _ship.position.x + (_shipPointsPerSecY * dt);
     newX = MIN(MAX(newX, minX), maxX);
+    /*float maxX = winSize.width - _ship.contentSize.width/2;
+    float minX = _ship.contentSize.width/2;
+    
+    float newX = _ship.position.x + (_shipPointsPerSecZ * dt);
+    newX = MIN(MAX(newX, minX), maxX);*/
     //_ship.position = ccp(newX, newY);
-    _ship.position = ccp(_ship.position.x, newY);
+    _ship.position = ccp(newX, _ship.position.y);
     
     double curTime = CACurrentMediaTime();
     if (curTime > _nextAsteroidSpawn) {
         
-        float randSecs = [self randomValueBetween:2 andValue:2.5];
+        float randSecs = [self randomValueBetween:.4 andValue:.8];
         _nextAsteroidSpawn = randSecs + curTime;
         
-        float randY = [self randomValueBetween:0.0 andValue:winSize.height];
-        float randDuration = 10;//[self randomValueBetween:2.0 andValue:10.0];
+        float randX = [self randomValueBetween:0.0 andValue:winSize.width];
         
-        CCSprite *asteroid = [_asteroids objectAtIndex:_nextAsteroid];
+        CCSprite *asteroid = [_trees objectAtIndex:_nextAsteroid];
         _nextAsteroid++;
-        if (_nextAsteroid >= _asteroids.count) _nextAsteroid = 0;
+        if (_nextAsteroid >= _trees.count) _nextAsteroid = 0;
         
         [asteroid stopAllActions];
-        asteroid.position = ccp(winSize.width+asteroid.contentSize.width/2, randY);
+        asteroid.position = ccp(randX, -100);
         asteroid.visible = YES;
         [asteroid runAction:[CCSequence actions:
-                             [CCMoveBy actionWithDuration:randDuration position:ccp(-winSize.width-asteroid.contentSize.width, 0)],
+                             [CCMoveBy actionWithDuration:_randDuration position:ccp(0, winSize.height+110+asteroid.contentSize.height)],
                              [CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],
                              nil]];
     }
     
-    for (CCSprite *asteroid in _asteroids) {        
+    
+    CGRect shiprect = CGRectMake(_ship.boundingBox.origin.x+_ship.boundingBox.size.width/2, _ship.boundingBox.origin.y+_ship.boundingBox.size.height/2, _ship.boundingBox.size.width/4, _ship.boundingBox.size.height/8);
+    
+    for (CCSprite *asteroid in _trees) {        
         if (!asteroid.visible) continue;
         
-        /*for (CCSprite *shipLaser in _shipLasers) {                        
-            if (!shipLaser.visible) continue;
-            
-            if (CGRectIntersectsRect(shipLaser.boundingBox, asteroid.boundingBox)) {                
-                shipLaser.visible = NO;
-                asteroid.visible = NO;                
-                continue;
-            }
-        }*/
-        
-        if (CGRectIntersectsRect(_ship.boundingBox, asteroid.boundingBox)) {
+        if (CGRectIntersectsRect(shiprect, asteroid.boundingBox)) {
             asteroid.visible = NO;
             [_ship runAction:[CCBlink actionWithDuration:1.0 blinks:9]];            
             _lives--;
@@ -176,10 +164,20 @@
     if (_lives <= 0) {
         [_ship stopAllActions];
         _ship.visible = FALSE;
+        [trail stopSystem];
         [self endScene:kEndReasonLose];
     } else if (curTime >= _gameOverTime) {
         [self endScene:kEndReasonWin];
     }
+    
+    if(_shipPointsPerSecY < 0){
+        [_ship setTexture: [[CCSprite spriteWithFile:@"penguin-left.png"]texture]];
+    }else{
+        [_ship setTexture: [[CCSprite spriteWithFile:@"penguin-right.png"]texture]];
+    }
+    
+    
+    trail.position=ccp(_ship.position.x, _ship.position.y-20);
 }
 
 - (void)setInvisible:(CCNode *)node {
@@ -190,11 +188,13 @@
     
     #define kFilteringFactor .5
     #define kRestAccelX 0
+    #define kRestAccelY 0
     #define kRestAccelZ -0.6
     #define kShipMaxPointsPerSecWidth (winSize.width*10)
     #define kShipMaxPointsPerSecHeight (winSize.height*0.5)
     #define kMaxDiffX 0.9
     #define kMaxDiffZ 0.3
+    #define kMaxDiffY 0.5
     
     UIAccelerationValue rollingX, rollingY, rollingZ;
     
@@ -267,6 +267,26 @@
     [restartItem runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
     [label runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
     
+}
+
+-(void)ccTouchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
+    CGSize winSize = [CCDirector sharedDirector].winSize;
+    
+    if(_started == NO){
+        [_startLine runAction:[CCSequence actions:
+                             [CCMoveBy actionWithDuration:2 position:ccp(0, winSize.height+100)],[CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],nil]];
+        [self addChild:trail];
+        [self scheduleUpdate];
+        _started = YES;
+    }else{
+        _backgroundSpeed = 2000;
+        _randDuration = 1.2;
+    }
+}
+
+- (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    _backgroundSpeed = 1000;
+    _randDuration = 2.4;
 }
 
 // on "dealloc" you need to release all your retained objects
