@@ -11,7 +11,7 @@
 #import "HelloWorldLayer.h"
 #import "CCParallaxNode-Extras.h"
 
-#define kNumTrees 6
+#define kNumTrees 6 
 
 // HelloWorldLayer implementation
 @implementation HelloWorldLayer
@@ -35,13 +35,20 @@
 -(id) init
 {
     if( (self=[super init])) {
-        
+        timer = 0;
         _started = NO;
         self.isTouchEnabled = YES;
-        _ship = [CCSprite spriteWithFile:@"penguin-right.png"];  // 4
+        _man = [CCSprite spriteWithFile:@"penguin-right.png"];  // 4
         CGSize winSize = [CCDirector sharedDirector].winSize; // 5
-        _ship.position = ccp(winSize.width * 0.5, winSize.height * 0.72); // 6
-        [self addChild:_ship z:1];
+        jumpOrigin = winSize.height * 0.72;
+        _man.position = ccp(winSize.width * 0.5, winSize.height * 0.72); // 6
+        dropShadowSprite = [CCSprite spriteWithSpriteFrame:[_man displayedFrame]];
+        //[self addChild:dropShadowSprite z: -1];
+        [dropShadowSprite setOpacity:100];
+        [dropShadowSprite setColor:ccBLACK];
+        [dropShadowSprite setPosition:ccp(winSize.width * 0.5, winSize.height * 0.72)];
+        [self addChild:dropShadowSprite];
+        [self addChild:_man z:1];
         
         _startLine = [CCSprite spriteWithFile:@"startLineGate.png"];
         _startLine.position = ccp(winSize.width/2, winSize.height-_startLine.contentSize.height/2);
@@ -64,9 +71,6 @@
         [_backgroundNode addChild:_background1 z:0 parallaxRatio:dustSpeed positionOffset:ccp(winSize.width/2,0)];
         [_backgroundNode addChild:_background2 z:0 parallaxRatio:dustSpeed positionOffset:ccp(winSize.width/2,-(_background1.contentSize.height))]; 
         
-        _backgroundSpeed = 1000;
-        _randDuration = 2.4;
-        
         CCParticleSystemQuad *snowEffect = [CCParticleSystemQuad particleWithFile:@"snow.plist"];
         //[self addChild:snowEffect];
         
@@ -75,25 +79,40 @@
         _trees = [[CCArray alloc] initWithCapacity:kNumTrees];
         for(int i = 0; i < kNumTrees; ++i) {
             CCSprite *tree;
-            if(i%2 == 0){
-                tree = [CCSprite spriteWithFile:@"dead-tree.png"];
-            }else{
+            if(i%2==0){
                 tree = [CCSprite spriteWithFile:@"trees-evergreen.png"];
+            }else{
+                tree = [CCSprite spriteWithFile:@"dead-tree.png"];
             }
             tree.visible = NO;
             [self addChild:tree];
             [_trees addObject:tree];
         }
         
+        _rocks = [[CCArray alloc] initWithCapacity:kNumTrees];
+        for(int i = 0; i < kNumTrees; ++i) {
+            CCSprite *rock;
+            rock = [CCSprite spriteWithFile:@"rock.png"];
+            rock.visible = NO;
+            [self addChild:rock];
+            [_rocks addObject:rock];
+        }
+        
         _lives = 3;
         double curTime = CACurrentMediaTime();
         _gameOverTime = curTime + 30.0;
         
+        _backgroundSpeed = 1000;
+        _randDuration = 2.3;
+        
         trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail2.plist"];
         trail.positionType=kCCPositionTypeFree;
-		trail.position=ccp(_ship.position.x, _ship.position.y-20);
+		trail.position=ccp(_man.position.x, _man.position.y-20);
         
         //[self scheduleUpdate];
+        
+        jumpHeight = 0;
+        jumping = NO;
     }
     return self;
 }
@@ -104,6 +123,7 @@
 
 - (void)update:(ccTime)dt {
     CGPoint backgroundScrollVel = ccp(0, _backgroundSpeed);
+    CGPoint asteroidScrollVel = ccp(0, _backgroundSpeed/3.4);
     _backgroundNode.position = ccpAdd(_backgroundNode.position, ccpMult(backgroundScrollVel, dt));
     
     NSArray *spaceDusts = [NSArray arrayWithObjects:_background1, _background2, nil];
@@ -114,23 +134,35 @@
     }
     
     CGSize winSize = [CCDirector sharedDirector].winSize;
-    float maxX = winSize.width - _ship.contentSize.width/2;
-    float minX = _ship.contentSize.width/2;
+    float maxX = winSize.width - _man.contentSize.width/2;
+    float minX = _man.contentSize.width/2;
     
-    float newX = _ship.position.x + (_shipPointsPerSecY * dt);
+    float newX = _man.position.x + (_shipPointsPerSecY * dt);
     newX = MIN(MAX(newX, minX), maxX);
-    /*float maxX = winSize.width - _ship.contentSize.width/2;
-    float minX = _ship.contentSize.width/2;
     
-    float newX = _ship.position.x + (_shipPointsPerSecZ * dt);
-    newX = MIN(MAX(newX, minX), maxX);*/
-    //_ship.position = ccp(newX, newY);
-    _ship.position = ccp(newX, _ship.position.y);
+    if(!jumping){
+        if(_man.position.y == jumpOrigin + 32){
+            _man.position = ccp(newX, _man.position.y - 2);
+            [trail resetSystem];
+        }else if(_man.position.y > jumpOrigin){
+            _man.position = ccp(newX, _man.position.y - 2);
+        }else{
+            _man.position = ccp(newX, _man.position.y);
+        }
+    }else{
+        _man.position = ccp(newX, _man.position.y + 4);
+    }
+    
+    [dropShadowSprite setDisplayFrame:[_man displayedFrame]];
+    dropShadowSprite.position = ccp(newX, jumpOrigin);
+    
     
     double curTime = CACurrentMediaTime();
+    _backgroundSpeed = 1000 + timer;
+
     if (curTime > _nextAsteroidSpawn) {
         
-        float randSecs = [self randomValueBetween:.4 andValue:.8];
+        float randSecs = [self randomValueBetween:500/_backgroundSpeed andValue:1000/_backgroundSpeed];
         _nextAsteroidSpawn = randSecs + curTime;
         
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
@@ -142,42 +174,77 @@
         [asteroid stopAllActions];
         asteroid.position = ccp(randX, -100);
         asteroid.visible = YES;
-        [asteroid runAction:[CCSequence actions:
-                             [CCMoveBy actionWithDuration:_randDuration position:ccp(0, winSize.height+110+asteroid.contentSize.height)],
-                             [CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],
-                             nil]];
+    }
+    
+    if (curTime > _nextRockSpawn) {
+        
+        float randSecs = [self randomValueBetween:1200/_backgroundSpeed andValue:2200/_backgroundSpeed];
+        _nextRockSpawn = randSecs + curTime;
+        
+        float randX = [self randomValueBetween:0.0 andValue:winSize.width];
+        
+        CCSprite *rock = [_rocks objectAtIndex:_nextRock];
+        _nextRock++;
+        if (_nextRock >= _rocks.count) _nextRock = 0;
+        
+        [rock stopAllActions];
+        rock.position = ccp(randX, -100);
+        rock.visible = YES;
     }
     
     
-    CGRect shiprect = CGRectMake(_ship.boundingBox.origin.x+_ship.boundingBox.size.width/2, _ship.boundingBox.origin.y+_ship.boundingBox.size.height/2, _ship.boundingBox.size.width/4, _ship.boundingBox.size.height/8);
+    CGRect shiprect = CGRectMake(_man.boundingBox.origin.x+_man.boundingBox.size.width/2, _man.boundingBox.origin.y+_man.boundingBox.size.height/2, _man.boundingBox.size.width/4, _man.boundingBox.size.height/8);
     
-    for (CCSprite *asteroid in _trees) {        
-        if (!asteroid.visible) continue;
+    for (CCSprite *asteroid in _trees) {
+        asteroid.position = ccpAdd(asteroid.position, ccpMult(asteroidScrollVel, dt));
         
-        if (CGRectIntersectsRect(shiprect, asteroid.boundingBox)) {
+        if (!asteroid.visible) continue;
+        CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x+10, asteroid.boundingBox.origin.y+20, asteroid.boundingBox.size.width-20, asteroid.boundingBox.size.height-20);
+        
+        if (CGRectIntersectsRect(shiprect, asteroidRect)) {
             asteroid.visible = NO;
-            [_ship runAction:[CCBlink actionWithDuration:1.0 blinks:9]];            
             _lives--;
+            timer = timer - 700;
         }
     }
     
-    if (_lives <= 0) {
-        [_ship stopAllActions];
-        _ship.visible = FALSE;
+    for (CCSprite *rock in _rocks) {
+        rock.position = ccpAdd(rock.position, ccpMult(asteroidScrollVel, dt));
+        
+        if (!rock.visible) continue;
+        CGRect asteroidRect = CGRectMake(rock.boundingBox.origin.x+10, rock.boundingBox.origin.y+20, rock.boundingBox.size.width-20, rock.boundingBox.size.height-20);
+        
+        if (CGRectIntersectsRect(shiprect, asteroidRect) && _man.position.y == jumpOrigin) {
+            rock.visible = NO;
+            [_man stopAllActions];
+            _man.visible = FALSE;
+            dropShadowSprite.visible = FALSE;
+            [trail stopSystem];
+            [self endScene:kEndReasonLose];
+        }
+    }
+    
+    
+    if (timer + 1000 < 300) {
+        [_man stopAllActions];
+        _man.visible = FALSE;
+        dropShadowSprite.visible = FALSE;
         [trail stopSystem];
         [self endScene:kEndReasonLose];
     } else if (curTime >= _gameOverTime) {
-        [self endScene:kEndReasonWin];
+        //[self endScene:kEndReasonWin];
     }
     
     if(_shipPointsPerSecY < 0){
-        [_ship setTexture: [[CCSprite spriteWithFile:@"penguin-left.png"]texture]];
+        [_man setTexture: [[CCSprite spriteWithFile:@"penguin-left.png"]texture]];
     }else{
-        [_ship setTexture: [[CCSprite spriteWithFile:@"penguin-right.png"]texture]];
+        [_man setTexture: [[CCSprite spriteWithFile:@"penguin-right.png"]texture]];
     }
     
     
-    trail.position=ccp(_ship.position.x, _ship.position.y-20);
+    trail.position=ccp(_man.position.x, _man.position.y-20);
+    
+    NSLog(@"%d", timer);
 }
 
 - (void)setInvisible:(CCNode *)node {
@@ -190,7 +257,7 @@
     #define kRestAccelX 0
     #define kRestAccelY 0
     #define kRestAccelZ -0.6
-    #define kShipMaxPointsPerSecWidth (winSize.width*10)
+    #define kShipMaxPointsPerSecWidth (winSize.width*7)
     #define kShipMaxPointsPerSecHeight (winSize.height*0.5)
     #define kMaxDiffX 0.9
     #define kMaxDiffZ 0.3
@@ -198,9 +265,9 @@
     
     UIAccelerationValue rollingX, rollingY, rollingZ;
     
-    rollingX = (acceleration.x * kFilteringFactor) + (rollingX * (1.0 - kFilteringFactor));    
-    rollingY = (acceleration.y * kFilteringFactor) + (rollingY * (1.0 - kFilteringFactor));    
-    rollingZ = (acceleration.z * kFilteringFactor) + (rollingZ * (1.0 - kFilteringFactor));
+    rollingX = (acceleration.x * kFilteringFactor);// + (rollingX * (1.0 - kFilteringFactor));
+    rollingY = (acceleration.y * kFilteringFactor);// + (rollingY * (1.0 - kFilteringFactor));
+    rollingZ = (acceleration.z * kFilteringFactor);// + (rollingZ * (1.0 - kFilteringFactor));
     
     float accelX = acceleration.x - rollingX;
     float accelY = acceleration.y - rollingY;
@@ -277,16 +344,49 @@
                              [CCMoveBy actionWithDuration:2 position:ccp(0, winSize.height+100)],[CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],nil]];
         [self addChild:trail];
         [self scheduleUpdate];
+        [self schedule:@selector(updateTimer) interval:.3];
         _started = YES;
+        
     }else{
+        /*
         _backgroundSpeed = 2000;
         _randDuration = 1.2;
+         
+        [self schedule:@selector(countPressTime:) interval:1];
+        pressTime = 0;
+         
+         */
+        
+        jumping = YES;
+        [self schedule:@selector(jumper) interval:.2];
+        [trail stopSystem];
     }
 }
 
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    /*
     _backgroundSpeed = 1000;
     _randDuration = 2.4;
+     */
+}
+
+-(void)jumper{
+    jumping = NO;
+    [self unschedule:@selector(jumper)];
+}
+
+-(void)updateTimer{
+    timer = timer + 30;
+}
+
+
+-(void)countPressTime:(ccTime)dt {
+    pressTime++;
+    
+    if ( pressTime == 5 ) {    //If user tapped and hold for 5 seconds...
+        NSLog(@"%@", @"Held");
+    }
+    
 }
 
 // on "dealloc" you need to release all your retained objects

@@ -19,18 +19,22 @@ typedef enum {
 @interface HelloWorldLayer : CCLayer
 {
     CCSpriteBatchNode *_batchNode;
-    CCSprite *_ship;
+    CCSprite *_man;
     
     CCParallaxNode *_backgroundNode;
     CCSprite *_background1;
     CCSprite *_background2;
     CCSprite *_startLine;
+    CCSprite *dropShadowSprite;
     float _shipPointsPerSecY;
     float _shipPointsPerSecZ;
     
     CCArray *_trees;
+    CCArray *_rocks;
     int _nextAsteroid;
+    int _nextRock;
     double _nextAsteroidSpawn;
+    double _nextRockSpawn;
     
     int _lives;
     
@@ -44,6 +48,13 @@ typedef enum {
     
     float _backgroundSpeed; 
     float _randDuration;
+    
+    int pressTime;
+    BOOL jumping;
+    float jumpHeight;
+    float jumpOrigin;
+    int timer;
+    
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child

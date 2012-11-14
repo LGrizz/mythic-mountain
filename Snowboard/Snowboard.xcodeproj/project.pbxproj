@@ -15,6 +15,7 @@
 		2783B1A7152B8FAD00C19774 /* penguin-right.png in Resources */ = {isa = PBXBuildFile; fileRef = 2783B1A5152B8FAD00C19774 /* penguin-right.png */; };
 		2783B1AA152B982E00C19774 /* trail2.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2783B1A9152B982E00C19774 /* trail2.plist */; };
 		279C8F1B152B89BA00F632E0 /* penguin.png in Resources */ = {isa = PBXBuildFile; fileRef = 279C8F1A152B89BA00F632E0 /* penguin.png */; };
+		279D92C51653631A00D77E78 /* rock.png in Resources */ = {isa = PBXBuildFile; fileRef = 279D92C41653631A00D77E78 /* rock.png */; };
 		27B05907152BCC8500048E71 /* startLine.png in Resources */ = {isa = PBXBuildFile; fileRef = 27B05906152BCC8500048E71 /* startLine.png */; };
 		27B0590A152BD03300048E71 /* startLineGate.png in Resources */ = {isa = PBXBuildFile; fileRef = 27B05909152BD03300048E71 /* startLineGate.png */; };
 		27B0590C152BD5BA00048E71 /* trees-evergreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 27B0590B152BD5BA00048E71 /* trees-evergreen.png */; };
@@ -164,6 +165,7 @@
 		2783B1A5152B8FAD00C19774 /* penguin-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "penguin-right.png"; sourceTree = "<group>"; };
 		2783B1A9152B982E00C19774 /* trail2.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = trail2.plist; sourceTree = "<group>"; };
 		279C8F1A152B89BA00F632E0 /* penguin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = penguin.png; sourceTree = "<group>"; };
+		279D92C41653631A00D77E78 /* rock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rock.png; sourceTree = "<group>"; };
 		27B05906152BCC8500048E71 /* startLine.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = startLine.png; sourceTree = "<group>"; };
 		27B05909152BD03300048E71 /* startLineGate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = startLineGate.png; sourceTree = "<group>"; };
 		27B0590B152BD5BA00048E71 /* trees-evergreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "trees-evergreen.png"; sourceTree = "<group>"; };
@@ -447,6 +449,7 @@
 		272134A41523F86000713A11 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				279D92C41653631A00D77E78 /* rock.png */,
 				27B0590B152BD5BA00048E71 /* trees-evergreen.png */,
 				27B05909152BD03300048E71 /* startLineGate.png */,
 				27B05906152BCC8500048E71 /* startLine.png */,
@@ -998,6 +1001,7 @@
 				27B05907152BCC8500048E71 /* startLine.png in Resources */,
 				27B0590A152BD03300048E71 /* startLineGate.png in Resources */,
 				27B0590C152BD5BA00048E71 /* trees-evergreen.png in Resources */,
+				279D92C51653631A00D77E78 /* rock.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
