@@ -154,6 +154,7 @@
 		27D78DF91523DA3600B15A3A /* SpaceGame.caf in Resources */ = {isa = PBXBuildFile; fileRef = 27D78DE41523DA3600B15A3A /* SpaceGame.caf */; };
 		27D78DFA1523DA3600B15A3A /* Sprites.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27D78DE61523DA3600B15A3A /* Sprites.plist */; };
 		27D78DFB1523DA3600B15A3A /* Sprites.pvr.ccz in Resources */ = {isa = PBXBuildFile; fileRef = 27D78DE71523DA3600B15A3A /* Sprites.pvr.ccz */; };
+		27FB29381655BA0300920ADE /* pixeltree.png in Resources */ = {isa = PBXBuildFile; fileRef = 27FB29371655BA0300920ADE /* pixeltree.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -425,6 +426,7 @@
 		27D78DE41523DA3600B15A3A /* SpaceGame.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SpaceGame.caf; sourceTree = "<group>"; };
 		27D78DE61523DA3600B15A3A /* Sprites.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Sprites.plist; sourceTree = "<group>"; };
 		27D78DE71523DA3600B15A3A /* Sprites.pvr.ccz */ = {isa = PBXFileReference; lastKnownFileType = file; path = Sprites.pvr.ccz; sourceTree = "<group>"; };
+		27FB29371655BA0300920ADE /* pixeltree.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pixeltree.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -449,6 +451,7 @@
 		272134A41523F86000713A11 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				27FB29371655BA0300920ADE /* pixeltree.png */,
 				279D92C41653631A00D77E78 /* rock.png */,
 				27B0590B152BD5BA00048E71 /* trees-evergreen.png */,
 				27B05909152BD03300048E71 /* startLineGate.png */,
@@ -1002,6 +1005,7 @@
 				27B0590A152BD03300048E71 /* startLineGate.png in Resources */,
 				27B0590C152BD5BA00048E71 /* trees-evergreen.png in Resources */,
 				279D92C51653631A00D77E78 /* rock.png in Resources */,
+				27FB29381655BA0300920ADE /* pixeltree.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1157,6 +1161,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1166,6 +1171,7 @@
 				INFOPLIST_FILE = Snowboard/Resources/Info.plist;
 				OTHER_LDFLAGS = "-lz";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1174,6 +1180,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Snowboard/Prefix.pch;
@@ -1182,6 +1189,7 @@
 				INFOPLIST_FILE = Snowboard/Resources/Info.plist;
 				OTHER_LDFLAGS = "-lz";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};

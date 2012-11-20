@@ -55,6 +55,11 @@ typedef enum {
     float jumpOrigin;
     int timer;
     
+    float score;
+    float scoreTime;
+    
+    CCLabelTTF * scoreLabel;
+    
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child

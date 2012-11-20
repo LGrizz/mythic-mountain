@@ -11,7 +11,7 @@
 #import "HelloWorldLayer.h"
 #import "CCParallaxNode-Extras.h"
 
-#define kNumTrees 6 
+#define kNumTrees 10 
 
 // HelloWorldLayer implementation
 @implementation HelloWorldLayer
@@ -79,11 +79,11 @@
         _trees = [[CCArray alloc] initWithCapacity:kNumTrees];
         for(int i = 0; i < kNumTrees; ++i) {
             CCSprite *tree;
-            if(i%2==0){
-                tree = [CCSprite spriteWithFile:@"trees-evergreen.png"];
-            }else{
+            //if(i%2==0){
+                tree = [CCSprite spriteWithFile:@"pixeltree.png"];
+            /*}else{
                 tree = [CCSprite spriteWithFile:@"dead-tree.png"];
-            }
+            }*/
             tree.visible = NO;
             [self addChild:tree];
             [_trees addObject:tree];
@@ -113,6 +113,15 @@
         
         jumpHeight = 0;
         jumping = NO;
+        
+        score = 0;
+        scoreTime = 0;
+        
+        scoreLabel =[CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d ", 0] fontName:@"Verdana" fontSize:22];
+        scoreLabel.position = ccp(winSize.width-40, 15);
+        scoreLabel.color = ccc3(0, 0, 0);
+        
+        [self addChild:scoreLabel];
     }
     return self;
 }
@@ -162,7 +171,7 @@
 
     if (curTime > _nextAsteroidSpawn) {
         
-        float randSecs = [self randomValueBetween:500/_backgroundSpeed andValue:1000/_backgroundSpeed];
+        float randSecs = [self randomValueBetween:300/_backgroundSpeed andValue:500/_backgroundSpeed];
         _nextAsteroidSpawn = randSecs + curTime;
         
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
@@ -204,7 +213,7 @@
         if (CGRectIntersectsRect(shiprect, asteroidRect)) {
             asteroid.visible = NO;
             _lives--;
-            timer = timer - 700;
+            timer = timer - 500;
         }
     }
     
@@ -212,15 +221,29 @@
         rock.position = ccpAdd(rock.position, ccpMult(asteroidScrollVel, dt));
         
         if (!rock.visible) continue;
-        CGRect asteroidRect = CGRectMake(rock.boundingBox.origin.x+10, rock.boundingBox.origin.y+20, rock.boundingBox.size.width-20, rock.boundingBox.size.height-20);
+        CGRect rockRect = CGRectMake(rock.boundingBox.origin.x+10, rock.boundingBox.origin.y+20, rock.boundingBox.size.width-20, rock.boundingBox.size.height-20);
         
-        if (CGRectIntersectsRect(shiprect, asteroidRect) && _man.position.y == jumpOrigin) {
-            rock.visible = NO;
+        if (CGRectIntersectsRect(shiprect, rockRect) && _man.position.y == jumpOrigin) {
+            //rock.visible = NO;
             [_man stopAllActions];
-            _man.visible = FALSE;
+            //_man.visible = FALSE;
+            [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-50)]];
+            [_man runAction:[CCRotateBy actionWithDuration:0.4 angle:180]];
             dropShadowSprite.visible = FALSE;
             [trail stopSystem];
+            [self unschedule:@selector(updateScoreTimer)];
             [self endScene:kEndReasonLose];
+        }
+        
+        
+        for (CCSprite *asteroid in _trees) {
+            
+            if (!asteroid.visible) continue;
+            CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x, asteroid.boundingBox.origin.y, asteroid.boundingBox.size.width, asteroid.boundingBox.size.height);
+            
+            if (CGRectIntersectsRect(asteroidRect, rockRect)) {
+                asteroid.visible = NO;
+            }
         }
     }
     
@@ -230,6 +253,7 @@
         _man.visible = FALSE;
         dropShadowSprite.visible = FALSE;
         [trail stopSystem];
+        [self unschedule:@selector(updateScoreTimer)];
         [self endScene:kEndReasonLose];
     } else if (curTime >= _gameOverTime) {
         //[self endScene:kEndReasonWin];
@@ -244,7 +268,10 @@
     
     trail.position=ccp(_man.position.x, _man.position.y-20);
     
-    NSLog(@"%d", timer);
+    //scoreTime++;
+    score++;
+    NSString *str = [NSString stringWithFormat:@"%i", (int)score];
+    [scoreLabel setString:str];
 }
 
 - (void)setInvisible:(CCNode *)node {
@@ -253,7 +280,7 @@
 
 - (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
     
-    #define kFilteringFactor .5
+    #define kFilteringFactor .6
     #define kRestAccelX 0
     #define kRestAccelY 0
     #define kRestAccelZ -0.6
@@ -334,6 +361,8 @@
     [restartItem runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
     [label runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
     
+    [self unscheduleUpdate];
+    
 }
 
 -(void)ccTouchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
@@ -345,6 +374,7 @@
         [self addChild:trail];
         [self scheduleUpdate];
         [self schedule:@selector(updateTimer) interval:.3];
+        [self schedule:@selector(updateScoreTimer) interval:.2];
         _started = YES;
         
     }else{
@@ -356,10 +386,11 @@
         pressTime = 0;
          
          */
-        
-        jumping = YES;
-        [self schedule:@selector(jumper) interval:.2];
-        [trail stopSystem];
+        if(!jumping && _man.position.y == jumpOrigin){
+            jumping = YES;
+            [self schedule:@selector(jumper) interval:.2];
+            [trail stopSystem];
+        }
     }
 }
 
@@ -376,9 +407,18 @@
 }
 
 -(void)updateTimer{
-    timer = timer + 30;
+    NSLog(@"%d", timer);
+    if(timer < 0){
+        timer = timer + 200;
+    }else{
+        timer = timer + 20;
+    }
 }
 
+-(void)updateScoreTimer{
+    
+
+}
 
 -(void)countPressTime:(ccTime)dt {
     pressTime++;
