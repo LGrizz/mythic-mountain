@@ -31,10 +31,17 @@ typedef enum {
     
     CCArray *_trees;
     CCArray *_rocks;
+    CCArray *_spikes;
     int _nextAsteroid;
     int _nextRock;
+    int _nextSpike;
     double _nextAsteroidSpawn;
     double _nextRockSpawn;
+    double _nextSpikeSpawn;
+    double _nextCliffSpawn;
+    
+    CCSprite *cliff;
+    
     
     int _lives;
     
@@ -45,6 +52,7 @@ typedef enum {
     
     
     ARCH_OPTIMAL_PARTICLE_SYSTEM *trail;
+    ARCH_OPTIMAL_PARTICLE_SYSTEM *ava;
     
     float _backgroundSpeed; 
     float _randDuration;
@@ -57,6 +65,8 @@ typedef enum {
     
     float score;
     float scoreTime;
+    
+    CCSprite *blackSolid;
     
     CCLabelTTF * scoreLabel;
     

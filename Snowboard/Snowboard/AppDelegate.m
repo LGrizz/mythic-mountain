@@ -12,6 +12,7 @@
 #import "GameConfig.h"
 #import "HelloWorldLayer.h"
 #import "RootViewController.h"
+#import "SimpleAudioEngine.h"
 
 @implementation AppDelegate
 
