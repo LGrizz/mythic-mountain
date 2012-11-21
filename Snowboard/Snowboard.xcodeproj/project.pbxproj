@@ -176,7 +176,6 @@
 		27307C76152A2C2900EA673E /* snow.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = snow.plist; sourceTree = "<group>"; };
 		27307C7B152A3E5A00EA673E /* bluesnow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bluesnow.png; sourceTree = "<group>"; };
 		27307C7D152A7B4E00EA673E /* trail.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = trail.plist; sourceTree = "<group>"; };
-		277C76C9165C7CE500C058CB /* 1-07 There Might Be Coffee.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "1-07 There Might Be Coffee.m4a"; sourceTree = "<group>"; };
 		277C76CB165C7DFA00C058CB /* sfx.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = sfx.wav; sourceTree = "<group>"; };
 		277C76CD165C7E5600C058CB /* jump.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jump.wav; sourceTree = "<group>"; };
 		277C76CF165C7F1600C058CB /* bigJump.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = bigJump.wav; sourceTree = "<group>"; };
@@ -550,7 +549,6 @@
 		27B4AD441523D87400F6D9F2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				277C76C9165C7CE500C058CB /* 1-07 There Might Be Coffee.m4a */,
 				272134A41523F86000713A11 /* Images */,
 				27D78DCD1523DA3600B15A3A /* Backgrounds */,
 				27D78DD31523DA3600B15A3A /* Classes */,
