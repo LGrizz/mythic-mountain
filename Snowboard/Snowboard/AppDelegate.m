@@ -13,10 +13,11 @@
 #import "HelloWorldLayer.h"
 #import "RootViewController.h"
 #import "SimpleAudioEngine.h"
+#import "MainMenuScene.h"
 
 @implementation AppDelegate
 
-@synthesize window;
+@synthesize window, viewController;
 
 - (void) removeStartupFlicker
 {
@@ -41,6 +42,12 @@
 }
 - (void) applicationDidFinishLaunching:(UIApplication*)application
 {
+    // start of your application:didFinishLaunchingWithOptions
+    // ...
+    [TestFlight takeOff:@"415c19329a9a1bdba091c545b56deb61_NTg5OTAyMDEyLTAyLTAyIDExOjA5OjIyLjM4NDg4Mw"];
+    // The rest of your application:didFinishLaunchingWithOptions method
+    // ...
+    
 	// Init the window
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
@@ -90,13 +97,14 @@
 #endif
 	
 	[director setAnimationInterval:1.0/60];
-	[director setDisplayFPS:YES];
+	//[director setDisplayFPS:YES];
 	
 	
 	// make the OpenGLView a child of the view controller
 	[viewController setView:glView];
 	
 	// make the View Controller a child of the main window
+    [window setRootViewController:viewController];
 	[window addSubview: viewController.view];
 	
 	[window makeKeyAndVisible];
@@ -111,7 +119,7 @@
 	[self removeStartupFlicker];
 	
 	// Run the intro Scene
-	[[CCDirector sharedDirector] runWithScene: [HelloWorldLayer scene]];
+	[[CCDirector sharedDirector] runWithScene: [MainMenuScene scene]];
 }
 
 

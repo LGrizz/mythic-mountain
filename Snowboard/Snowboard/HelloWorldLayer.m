@@ -11,11 +11,15 @@
 #import "HelloWorldLayer.h"
 #import "CCParallaxNode-Extras.h"
 #import "SimpleAudioEngine.h"
+#import "CCGestureRecognizer.h"
 
-#define kNumTrees 8
+#define kNumTrees 20
 #define kNumRocks 5
 #define kNumSpikes 5 
 #define kNumCliff 1
+#define kNumCoins 10
+#define kNumIce 5
+#define kNumArches 5
 
 // HelloWorldLayer implementation
 @implementation HelloWorldLayer
@@ -39,35 +43,183 @@
 -(id) init
 {
     if( (self=[super init])) {
-        [[SimpleAudioEngine sharedEngine] playBackgroundMusic: @"1-07 There Might Be Coffee.m4a"];
+        CCGestureRecognizer* recognizer;
+        recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UISwipeGestureRecognizer alloc]init] autorelease] target:self action:@selector(swipe)];
+        ((UISwipeGestureRecognizer*)recognizer.gestureRecognizer).direction = UISwipeGestureRecognizerDirectionUp;
+        [self addGestureRecognizer:recognizer];
         
+        hitTime = NO;
+        fallen = NO;
+        tapCount = 0;
         timer = 0;
         _started = NO;
+        caught = NO;
+        dead = NO;
+        scoreFlipper = 0;
         self.isTouchEnabled = YES;
-        _man = [CCSprite spriteWithFile:@"snowboard-right.png"];  // 4
+        
+        //Character Animations
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiturn.plist"];
+        CCSpriteBatchNode *yetispriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiturn.png"];
+        [yetispriteSheet.texture setAliasTexParameters];
+        [self addChild:yetispriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetijumpright.plist"];
+        CCSpriteBatchNode *jumpspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetijumpright.png"];
+        [jumpspriteSheet.texture setAliasTexParameters];
+        [self addChild:jumpspriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetijumpleft.plist"];
+        CCSpriteBatchNode *jumpleftspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetijumpleft.png"];
+        [jumpleftspriteSheet.texture setAliasTexParameters];
+        [self addChild:jumpleftspriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetifalling.plist"];
+        CCSpriteBatchNode *fallingpriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetifalling.png"];
+        [fallingpriteSheet.texture setAliasTexParameters];
+        [self addChild:fallingpriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_getup.plist"];
+        CCSpriteBatchNode *getUpSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_getup.png"];
+        [getUpSheet.texture setAliasTexParameters];
+        [self addChild:getUpSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_punch.plist"];
+        CCSpriteBatchNode *punchSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_punch.png"];
+        [punchSheet.texture setAliasTexParameters];
+        [self addChild:punchSheet];
+        
+        //Board Animations
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardturn.plist"];
+        CCSpriteBatchNode *boardspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiboardturn.png"];
+        [boardspriteSheet.texture setAliasTexParameters];
+        [self addChild:boardspriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardjump.plist"];
+        CCSpriteBatchNode *boardjumpspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiboardjump.png"];
+        [boardjumpspriteSheet.texture setAliasTexParameters];
+        [self addChild:boardjumpspriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardjumpleft.plist"];
+        CCSpriteBatchNode *boardjumpleftspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiboardjumpleft.png"];
+        [boardjumpleftspriteSheet.texture setAliasTexParameters];
+        [self addChild:boardjumpleftspriteSheet];
+        
+        //Hill Object Animations
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"coinspin.plist"];
+        CCSpriteBatchNode *coinspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"coinspin.png"];
+        [coinspriteSheet.texture setAliasTexParameters];
+        [self addChild:coinspriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"coinspins.plist"];
+        CCSpriteBatchNode *coinpriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"coinspins.png"];
+        [coinpriteSheet.texture setAliasTexParameters];
+        [self addChild:coinpriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"treebreak.plist"];
+        CCSpriteBatchNode *treebreakSheet = [CCSpriteBatchNode batchNodeWithFile:@"treebreak.png"];
+        [treebreakSheet.texture setAliasTexParameters];
+        [self addChild:treebreakSheet];
+
+        //Enemy Animations
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"heli.plist"];
+        CCSpriteBatchNode *heliSheet = [CCSpriteBatchNode batchNodeWithFile:@"heli.png"];
+        [heliSheet.texture setAliasTexParameters];
+        [self addChild:heliSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"ladder.plist"];
+        CCSpriteBatchNode *ladderSheet = [CCSpriteBatchNode batchNodeWithFile:@"ladder.png"];
+        [ladderSheet.texture setAliasTexParameters];
+        [self addChild:ladderSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"trapper.plist"];
+        CCSpriteBatchNode *trapperSheet = [CCSpriteBatchNode batchNodeWithFile:@"trapper.png"];
+        [trapperSheet.texture setAliasTexParameters];
+        [self addChild:trapperSheet];
+        
+        
+        _man = [CCSprite spriteWithFile:@"yetiTurning01.png"];  // 4
+        _board = [CCSprite spriteWithFile:@"board_turning01.png"];  
+        [_man.texture setAliasTexParameters];
+        [_board.texture setAliasTexParameters];
         CGSize winSize = [CCDirector sharedDirector].winSize; // 5
-        jumpOrigin = winSize.height * 0.72;
-        _man.position = ccp(winSize.width * 0.5, winSize.height * 0.72); // 6
+        _man.position = ccp(winSize.width * 0.5, winSize.height - 210); // 6
+        jumpOrigin = winSize.height - 210;
         dropShadowSprite = [CCSprite spriteWithSpriteFrame:[_man displayedFrame]];
-        //[self addChild:dropShadowSprite z: -1];
         [dropShadowSprite setOpacity:100];
         [dropShadowSprite setColor:ccBLACK];
-        [dropShadowSprite setPosition:ccp(winSize.width * 0.5, winSize.height * 0.72)];
-        [self addChild:dropShadowSprite];
-        [self addChild:_man z:1];
+        [dropShadowSprite setPosition:ccp(_man.position.x, _man.position.y)];
+        [self addChild:dropShadowSprite z:899];
         
-        _startLine = [CCSprite spriteWithFile:@"startLineGate.png"];
-        _startLine.position = ccp(winSize.width/2, winSize.height-_startLine.contentSize.height/2);
-        //[self addChild:_startLine];
-        //[_batchNode addChild:_ship z:1]; // 7
+        dropShadowBoardSprite = [CCSprite spriteWithSpriteFrame:[_board displayedFrame]];
+        [dropShadowBoardSprite setOpacity:100];
+        [dropShadowBoardSprite setColor:ccBLACK];
+        [dropShadowBoardSprite setPosition:ccp(_board.position.x, _board.position.y)];
+        [self addChild:dropShadowBoardSprite z:899];
+        
+        cloud1 = [CCSprite spriteWithFile:@"cloud1.png"];
+        cloud1.position = ccp(-50, winSize.height - 45);
+        cloud2 = [CCSprite spriteWithFile:@"cloud1.png"];
+        cloud2.position = ccp(winSize.width+50, winSize.height - 110);
+        cloud3 = [CCSprite spriteWithFile:@"cloud2.png"];
+        cloud3.position = ccp(-50, winSize.height - 75);
+        
+        [self addChild:cloud1 z:900];
+        [self addChild:cloud2 z:900];
+        [self addChild:cloud3 z:900];
+        
+        [self addChild:_man z:900];
+        _board.position = ccp(winSize.width * 0.5, winSize.height - 210);
+        [self addChild:_board z:899];
+        streak = [CCMotionStreak streakWithFade:0.5 minSeg:0.1 image:@"snowflake.png" width:.1 length:.1 color:ccc4(255, 255, 255, 255)];
+        streak.position=ccp(_man.position.x, _man.position.y-20);
+        [self addChild:streak z:900];
+        
+        heli = [CCSprite spriteWithFile:@"heli1.png"];
+        heli.position = ccp(winSize.width/2, winSize.height + 140);
+        [self addChild:heli z:902];
+        NSMutableArray *heliArray = [NSMutableArray array];
+        for(int i = 1; i <= 2; ++i) {
+            [heliArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"heli%d.png", i]]];
+        }
+        
+        CCAnimation *helispin = [CCAnimation animationWithFrames:heliArray delay:0.1f];
+        [heli runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:helispin restoreOriginalFrame:NO]]];
+        
+        ladder = [CCSprite spriteWithFile:@"ladder1.png"];
+        ladder.position = ccp(winSize.width/2 + 40, winSize.height + 95);
+        [self addChild:ladder z:902];
+        NSMutableArray *ladderArray = [NSMutableArray array];
+        for(int i = 1; i <= 4; ++i) {
+            [ladderArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"ladder%d.png", i]]];
+        }
+        
+        CCAnimation *laddershake = [CCAnimation animationWithFrames:ladderArray delay:0.1f];
+        [ladder runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:laddershake restoreOriginalFrame:NO]]];
+        
+        trapper = [CCSprite spriteWithFile:@"trapper_heli1.png"];
+        trapper.position = ccp(winSize.width/2 + 30, winSize.height + 38);
+        [self addChild:trapper z:902];
+        NSMutableArray *trapperArray = [NSMutableArray array];
+        for(int i = 1; i <= 2; ++i) {
+            [trapperArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"trapper_heli%d.png", i]]];
+        }
+        
+        CCAnimation *trappershake = [CCAnimation animationWithFrames:trapperArray delay:0.1f];
+        [trapper runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:trappershake restoreOriginalFrame:NO]]];
         
         // 1) Create the CCParallaxNode
         _backgroundNode = [CCParallaxNode node];
         [self addChild:_backgroundNode z:-1];
         
         // 2) Create the sprites we'll add to the CCParallaxNode
-        _background1 = [CCSprite spriteWithFile:@"whitebg.png"];
+        _background1 = [CCSprite spriteWithFile:@"hill1.png"];
         _background2 = [CCSprite spriteWithFile:@"whitebg.png"];
+        
+        bg = [CCSprite spriteWithFile:@"hill1.png"];
+        bg.anchorPoint = ccp(0.5f,1.0f);
+        [bg setPosition:ccp(winSize.width/2, winSize.height-160)];
+        
+        
+        CCSprite *top = [CCSprite spriteWithFile:@"static_bg.png"];
+        [top setPosition:ccp(winSize.width/2, winSize.height - top.contentSize.height/2)];
+        [self addChild:top];
+        [self addChild:bg z:500];
         
         // 3) Determine relative movement speeds for space dust and background
         CGPoint dustSpeed = ccp(0, 0.3);
@@ -78,29 +230,32 @@
         
         CCParticleSystemQuad *snowEffect = [CCParticleSystemQuad particleWithFile:@"snow.plist"];
         
-       // [self addChild:snowEffect];
+        //[self addChild:snowEffect];
         
         self.isAccelerometerEnabled = YES;
         
         _trees = [[CCArray alloc] initWithCapacity:kNumTrees];
         for(int i = 0; i < kNumTrees; ++i) {
             CCSprite *tree;
-            if(i%2==0){
-                tree = [CCSprite spriteWithFile:@"tree-single.png"];
+            /*if(i%2==0){
+                tree = [CCSprite spriteWithFile:@"tree.png"];
             }else{
-                tree = [CCSprite spriteWithFile:@"tree-double.png"];
-            }
+                tree = [CCSprite spriteWithFile:@"treeArch.png"];
+            }*/
+            tree = [CCSprite spriteWithFile:@"tree.png"];
+            [tree.texture setAliasTexParameters];
             tree.visible = NO;
-            [self addChild:tree];
+            [self addChild:tree z:490];
             [_trees addObject:tree];
         }
         
         _rocks = [[CCArray alloc] initWithCapacity:kNumRocks];
         for(int i = 0; i < kNumRocks; ++i) {
             CCSprite *rock;
-            rock = [CCSprite spriteWithFile:@"rocker.png"];
+            rock = [CCSprite spriteWithFile:@"rock.png"];
             rock.visible = NO;
-            [self addChild:rock];
+            [rock.texture setAliasTexParameters];
+            [self addChild:rock z:898];
             [_rocks addObject:rock];
         }
         
@@ -109,52 +264,99 @@
             CCSprite *spike;
             spike = [CCSprite spriteWithFile:@"spikes.png"];
             spike.visible = NO;
-            [self addChild:spike];
+            [spike.texture setAliasTexParameters];
+            [self addChild:spike z:898];
             [_spikes addObject:spike];
+        }
+        
+        _coins = [[CCArray alloc] initWithCapacity:kNumCoins];
+        for(int i = 0; i < kNumCoins; ++i) {
+            CCSprite *coin;
+            coin = [CCSprite spriteWithFile:@"coin01.png"];
+            coin.visible = NO;
+            [coin.texture setAliasTexParameters];
+            [self addChild:coin z:898];
+            [_coins addObject:coin];
+        }
+        
+        _ices = [[CCArray alloc] initWithCapacity:kNumIce];
+        for(int i = 0; i < kNumIce; ++i) {
+            CCSprite *ice;
+            ice = [CCSprite spriteWithFile:@"ice.png"];
+            ice.visible = NO;
+            [ice.texture setAliasTexParameters];
+            [self addChild:ice z:898];
+            [_ices addObject:ice];
+        }
+        
+        _arches = [[CCArray alloc] initWithCapacity:kNumArches];
+        for(int i = 0; i < kNumArches; ++i) {
+            CCSprite *arch;
+            arch = [CCSprite spriteWithFile:@"treeArch.png"];
+            arch.visible = NO;
+            [arch.texture setAliasTexParameters];
+            [self addChild:arch z:898];
+            [_arches addObject:arch];
         }
         
         cliff = [CCSprite spriteWithFile:@"jump.png"];
         cliff.visible = NO;
-        [self addChild:cliff];
+        [cliff.texture setAliasTexParameters];
+        [self addChild:cliff z:898];
         
-        _lives = 3;
+        _lives = 4;
         double curTime = CACurrentMediaTime();
-        _gameOverTime = curTime + 30.0;
-        
-        _backgroundSpeed = 1000;
+        _backgroundSpeed = 3000;
         _randDuration = 2.3;
         
-        trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail2.plist"];
+        trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail4.plist"];
         trail.positionType=kCCPositionTypeFree;
-		trail.position=ccp(_man.position.x, _man.position.y-20);
-        
-        ava = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"avalanche.plist"];
-        ava.positionType=kCCPositionTypeFree;
-		trail.position=ccp(winSize.width/2, winSize.height);
-        [self addChild:ava z:998];
-        
-        //[self scheduleUpdate];
+		trail.position=ccp(_man.position.x, _man.position.y-10);
         
         jumpHeight = 0;
         jumping = NO;
         
         score = 0;
         scoreTime = 0;
+        coinScore = 0;
         
-        scoreLabel =[CCLabelTTF labelWithString:[NSString stringWithFormat:@"%d ", 0] fontName:@"Verdana" fontSize:22];
-        scoreLabel.position = ccp(winSize.width-40, 15);
-        scoreLabel.color = ccc3(0, 0, 0);
+        CCLabelTTF *scoreDistanceLabel = [CCLabelBMFont labelWithString:@"d" fntFile:@"distance_24pt.fnt"];
+        scoreDistanceLabel.position = ccp(winSize.width-18, 25);
+        [self addChild:scoreDistanceLabel z:999];
         
-        [self addChild:scoreLabel];
+        scoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%d", 0] fntFile:@"distance_24pt.fnt"];
+        scoreLabel.anchorPoint = ccp(1.0f,0.5f);
+        scoreLabel.position = ccp(winSize.width-30, 25);
         
-        blackSolid = [[[CCSprite alloc] init] autorelease];
-        [blackSolid setTextureRectInPixels:CGRectMake(0, 0, winSize.width, winSize.height+20) rotated:NO untrimmedSize:CGSizeMake(winSize.width, winSize.height+20)];
-        blackSolid.position = ccp(winSize.width/2, winSize.height+winSize.height/2-10);
-        blackSolid.color = ccBLACK;
-        [self addChild: blackSolid z:997];
-
+        [self addChild:scoreLabel z:999];
+        
+        CCMenuItemSprite *startButton = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"pauseUI.png"] selectedSprite:[CCSprite spriteWithFile:@"pauseUI.png"] target:self selector:@selector(pause:)];
+        CCMenu *starMenu = [CCMenu menuWithItems:startButton, nil];
+        starMenu.position = ccp(50, 30);
+        [self addChild:starMenu z:999];
+        
+        CCSprite *coinUI = [CCSprite spriteWithFile:@"coinUI.png"];
+        coinUI.position = ccp(winSize.width - 20, winSize.height - 30);
+        [self addChild:coinUI z:999];
+        
+        coinScoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%d", 0] fntFile:@"coin_24pt.fnt"];
+        coinScoreLabel.anchorPoint = ccp(1.0f,0.5f);
+        coinScoreLabel.position = ccp(winSize.width - 35, winSize.height - 33);
+        
+        [self addChild:coinScoreLabel z:999];
+        
+        _previousPointsPerSec = 0;
     }
     return self;
+}
+
+- (void) pause: (id) sender
+{
+    if([[CCDirector sharedDirector] isPaused]){
+        [[CCDirector sharedDirector] resume];
+    }else{
+        [[CCDirector sharedDirector] pause];
+    }
 }
 
 - (float)randomValueBetween:(float)low andValue:(float)high {
@@ -162,9 +364,9 @@
 }
 
 - (void)update:(ccTime)dt {
-    
     CGPoint backgroundScrollVel = ccp(0, _backgroundSpeed);
     CGPoint asteroidScrollVel = ccp(0, _backgroundSpeed/3.4);
+    
     _backgroundNode.position = ccpAdd(_backgroundNode.position, ccpMult(backgroundScrollVel, dt));
     
     NSArray *spaceDusts = [NSArray arrayWithObjects:_background1, _background2, nil];
@@ -173,10 +375,35 @@
             [_backgroundNode incrementOffset:ccp(0,-(2*spaceDust.contentSize.height)) forChild:spaceDust];
         }
     }
-    
     CGSize winSize = [CCDirector sharedDirector].winSize;
     float maxX = winSize.width - _man.contentSize.width/2;
     float minX = _man.contentSize.width/2;
+    
+    if(cloud1.position.x > winSize.width){
+        cloud1.position = ccp(-50, cloud1.position.y);
+    }else{
+        cloud1.position = ccp(cloud1.position.x + .8, cloud1.position.y);
+    }
+    
+    if(cloud2.position.x < -50){
+        cloud2.position = ccp(winSize.width+50, cloud2.position.y);
+    }else{
+        cloud2.position = ccp(cloud2.position.x - .7, cloud2.position.y);
+    }
+    
+    if(cloud3.position.x > winSize.width){
+        cloud3.position = ccp(-50, cloud3.position.y);
+    }else{
+        cloud3.position = ccp(cloud3.position.x + .6, cloud3.position.y);
+    }
+    
+    if(!fallen){
+    
+        if(heli.position.y <= winSize.height + 140){
+            heli.position = ccp(heli.position.x, heli.position.y + .5);
+            ladder.position = ccp(ladder.position.x, ladder.position.y + .5);
+            trapper.position = ccp(trapper.position.x, trapper.position.y + .5);
+        }
     
     float newX = _man.position.x + (_shipPointsPerSecY * dt);
     newX = MIN(MAX(newX, minX), maxX);
@@ -184,42 +411,148 @@
     if(!jumping){
         if(_man.position.y == jumpOrigin + 32){
             _man.position = ccp(newX, _man.position.y - 2);
+            _board.position = ccp(newX, _board.position.y - 2);
             [trail resetSystem];
         }else if(_man.position.y > jumpOrigin){
+            _man.scale = 1.04;
             _man.position = ccp(newX, _man.position.y - 2);
+            _board.position = ccp(newX, _board.position.y - 2);
         }else{
+            _man.scale = 1;
             _man.position = ccp(newX, _man.position.y);
+            _board.position = ccp(newX, _board.position.y);
         }
     }else{
+        _man.scale = 1.09;
         _man.position = ccp(newX, _man.position.y + 4);
+        _board.position = ccp(newX, _board.position.y + 4);
     }
+        
+        if(_shipPointsPerSecY < 0 && _previousPointsPerSec >= 0 && _man.position.y == jumpOrigin){
+            NSMutableArray *leftturnArray = [NSMutableArray array];
+            for(int i = 1; i <= 9; ++i) {
+                [leftturnArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yetiTurning0%d.png", i]]];
+            }
+            
+            leftturn = [CCAnimation animationWithFrames:leftturnArray delay:0.05f];
+            [_man runAction:[CCAnimate actionWithAnimation:leftturn restoreOriginalFrame:NO]];
+            
+            NSMutableArray *leftboardturnArray = [NSMutableArray array];
+            for(int i = 1; i <= 9; ++i) {
+                [leftboardturnArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"board_turning0%d.png", i]]];
+            }
+            
+            boardleftturn = [CCAnimation animationWithFrames:leftboardturnArray delay:0.05f];
+            [_board runAction:[CCAnimate actionWithAnimation:boardleftturn restoreOriginalFrame:NO]];
+            _previousPointsPerSec = _shipPointsPerSecY;
+        }else if (_shipPointsPerSecY > 0 && _previousPointsPerSec <= 0 && _man.position.y == jumpOrigin){
+            NSMutableArray *rightturnArray = [NSMutableArray array];
+            for(int i = 9; i >= 1; --i) {
+                [rightturnArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yetiTurning0%d.png", i]]];
+            }
+            rightturn = [CCAnimation animationWithFrames:rightturnArray delay:0.05f];
+            [_man runAction:[CCAnimate actionWithAnimation:rightturn restoreOriginalFrame:NO]];
+            
+            NSMutableArray *rightboardturnArray = [NSMutableArray array];
+            for(int i = 9; i >= 1; --i) {
+                [rightboardturnArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"board_turning0%d.png", i]]];
+            }
+            
+            boardrightturn = [CCAnimation animationWithFrames:rightboardturnArray delay:0.05f];
+            [_board runAction:[CCAnimate actionWithAnimation:boardrightturn restoreOriginalFrame:NO]];
+            _previousPointsPerSec = _shipPointsPerSecY;
+        }
+    
+    
     
     [dropShadowSprite setDisplayFrame:[_man displayedFrame]];
     dropShadowSprite.position = ccp(newX, jumpOrigin);
     
+    [dropShadowBoardSprite setDisplayFrame:[_board displayedFrame]];
+    dropShadowBoardSprite.position = ccp(newX, jumpOrigin);
     
     double curTime = CACurrentMediaTime();
-    _backgroundSpeed = 1000 + timer;
+    _backgroundSpeed = 840 + timer;
 
     if (curTime > _nextAsteroidSpawn) {
+        CCSprite *newTree = [CCSprite spriteWithFile:@"tree.png"];
         
-        float randSecs = [self randomValueBetween:600/_backgroundSpeed andValue:1000/_backgroundSpeed];
+        float randSecs = [self randomValueBetween:450/_backgroundSpeed andValue:750/_backgroundSpeed];
         _nextAsteroidSpawn = randSecs + curTime;
         
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
+        float randTree = [self randomValueBetween:0.0 andValue:10.0];
         
-        CCSprite *asteroid = [_trees objectAtIndex:_nextAsteroid];
+        CCSprite *asteroid1 = [_trees objectAtIndex:_nextAsteroid];
+            _nextAsteroid++;
+            
+        if (_nextAsteroid >= _trees.count)
+                _nextAsteroid = 0;
+        
+        [asteroid1 stopAllActions];
+        asteroid1.position = ccp(randX-20, -100);
+        [self reorderChild:asteroid1 z:901];
+        [asteroid1 setDisplayFrame:newTree.displayedFrame];
+        [asteroid1 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
+        asteroid1.visible = YES;
+        
+        
+        if((int)randTree > 2 && (int)randTree < 4){
+        CCSprite *asteroid2 = [_trees objectAtIndex:_nextAsteroid];
         _nextAsteroid++;
-        if (_nextAsteroid >= _trees.count) _nextAsteroid = 0;
         
-        [asteroid stopAllActions];
-        asteroid.position = ccp(randX, -100);
-        asteroid.visible = YES;
+            if (_nextAsteroid >= _trees.count)
+                _nextAsteroid = 0;
+            
+            [asteroid2 stopAllActions];
+            asteroid2.position = ccp(randX + (10 + (randTree/2)), -100);
+            [self reorderChild:asteroid2 z:901];
+            [asteroid2 setDisplayFrame:newTree.displayedFrame];
+            [asteroid2 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
+            asteroid2.visible = YES;
+            
+        }
+        
+        if((int)randTree > 7 && randTree < 9){
+            CCSprite *asteroid2 = [_trees objectAtIndex:_nextAsteroid];
+            _nextAsteroid++;
+            
+            if (_nextAsteroid >= _trees.count)
+                _nextAsteroid = 0;
+            
+            [asteroid2 stopAllActions];
+            asteroid2.position = ccp(randX, -100 + (10 + (randTree/2)));
+            [self reorderChild:asteroid2 z:901];
+            [asteroid2 setDisplayFrame:newTree.displayedFrame];
+            [asteroid2 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
+            asteroid2.visible = YES;
+            
+        CCSprite *asteroid3 = [_trees objectAtIndex:_nextAsteroid];
+        _nextAsteroid++;
+        
+            if (_nextAsteroid >= _trees.count)
+                _nextAsteroid = 0;
+        
+            [asteroid3 stopAllActions];
+            asteroid3.position = ccp(randX + (10 + (randTree/2)), -100);
+            [self reorderChild:asteroid3 z:901];
+            [asteroid3 setDisplayFrame:newTree.displayedFrame];
+            [asteroid3 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
+            asteroid3.visible = YES;
+        }
     }
     
-    if (curTime > _nextRockSpawn) {
+    if (curTime > _nextRockSpawn && score > 300) {
         
-        float randSecs = [self randomValueBetween:1200/_backgroundSpeed andValue:2200/_backgroundSpeed];
+        float randSecs = [self randomValueBetween:1000/_backgroundSpeed andValue:2500/_backgroundSpeed];
         _nextRockSpawn = randSecs + curTime;
         
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
@@ -230,12 +563,30 @@
         
         [rock stopAllActions];
         rock.position = ccp(randX, -100);
+        [self reorderChild:rock z:898];
         rock.visible = YES;
     }
-    
-    if (curTime > _nextSpikeSpawn) {
         
-        float randSecs = [self randomValueBetween:1500/_backgroundSpeed andValue:3200/_backgroundSpeed];
+    if (curTime > _nextIceSpawn && score > 700) {
+            
+        float randSecs = [self randomValueBetween:4000/_backgroundSpeed andValue:6000/_backgroundSpeed];
+        _nextIceSpawn = randSecs + curTime;
+            
+        float randX = [self randomValueBetween:0.0 andValue:winSize.width];
+            
+        CCSprite *ice = [_ices objectAtIndex:_nextIce];
+        _nextIce++;
+        if (_nextIce >= _ices.count) _nextIce = 0;
+            
+        [ice stopAllActions];
+        ice.position = ccp(randX, -100);
+        [self reorderChild:ice z:898];
+        ice.visible = YES;
+    }
+    
+    if (curTime > _nextSpikeSpawn && score > 1200) {
+        
+        float randSecs = [self randomValueBetween:3000/_backgroundSpeed andValue:5000/_backgroundSpeed];
         _nextSpikeSpawn = randSecs + curTime;
         
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
@@ -246,7 +597,51 @@
         
         [spike stopAllActions];
         spike.position = ccp(randX, -100);
+        [self reorderChild:spike z:898];
         spike.visible = YES;
+    }
+        
+    if (curTime > _nextArchSpawn && score > 100) {
+            
+        float randSecs = [self randomValueBetween:5000/_backgroundSpeed andValue:7000/_backgroundSpeed];
+        _nextArchSpawn = randSecs + curTime;
+            
+        float randX = [self randomValueBetween:0.0 andValue:winSize.width];
+            
+        CCSprite *arch = [_arches  objectAtIndex:_nextArch];
+        _nextArch++;
+        if (_nextArch >= _arches.count) _nextArch = 0;
+            
+        [arch stopAllActions];
+        arch.position = ccp(randX, -100);
+        [self reorderChild:arch z:901];
+        arch.visible = YES;
+    }
+    
+    if (curTime > _nextCoinSpawn) {
+        
+        float randSecs = [self randomValueBetween:100/_backgroundSpeed andValue:500/_backgroundSpeed];
+        _nextCoinSpawn = randSecs + curTime;
+        
+        float randX = [self randomValueBetween:0.0 andValue:winSize.width];
+        
+        CCSprite *coin = [_coins objectAtIndex:_nextCoin];
+        _nextCoin++;
+        if (_nextCoin >= _coins.count) _nextCoin = 0;
+        
+        [coin stopAllActions];
+        coin.position = ccp(randX, -100);
+        [self reorderChild:coin z:898];
+        coin.visible = YES;
+        NSMutableArray *coinArray = [NSMutableArray array];
+        for(int i = 1; i <= 10; ++i) {
+            [coinArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"coin%d.png", i]]];
+        }
+        
+        CCAnimation *coinspin = [CCAnimation animationWithFrames:coinArray delay:0.1f];
+        [coin runAction:[CCRepeat actionWithAction:[CCAnimate actionWithAnimation:coinspin restoreOriginalFrame:NO] times:2]];
     }
     
     if (curTime > _nextCliffSpawn) {
@@ -258,114 +653,215 @@
         
         [cliff stopAllActions];
         cliff.position = ccp(randX, -100);
+        [self reorderChild:cliff z:898];
         cliff.visible = YES;
     }
     
-    cliff.position = ccpAdd(cliff.position, ccpMult(asteroidScrollVel, dt));
     CGRect cliffRect = CGRectMake(cliff.boundingBox.origin.x, cliff.boundingBox.origin.y+40, cliff.boundingBox.size.width, 1);
     CGRect shiprect = CGRectMake(_man.boundingBox.origin.x+_man.boundingBox.size.width/2, _man.boundingBox.origin.y+_man.boundingBox.size.height/2, _man.boundingBox.size.width/4, _man.boundingBox.size.height/8);
+    CGRect manrect = CGRectMake(_man.boundingBox.origin.x, _man.boundingBox.origin.y, _man.boundingBox.size.width, _man.boundingBox.size.height);
+    CGRect boardrect = CGRectMake(_board.boundingBox.origin.x, _board.boundingBox.origin.y, _board.boundingBox.size.width, _board.boundingBox.size.height);
     
-    
-    if (CGRectIntersectsRect(shiprect, cliffRect) && _man.position.y == jumpOrigin) {
+    if (CGRectIntersectsRect(shiprect, cliffRect) && _man.position.y == jumpOrigin && cliff.zOrder > 490) {
         if(!jumping && _man.position.y == jumpOrigin){
-            [[SimpleAudioEngine sharedEngine] playEffect:@"bigJump.wav"];
+            //[[SimpleAudioEngine sharedEngine] playEffect:@"bigJump.wav"];
             jumping = YES;
             [self schedule:@selector(jumper) interval:.2];
-            //[self schedule:@selector(hideSnow) interval:.001];
             [trail stopSystem];
-            [_man runAction:[CCRotateBy actionWithDuration:0.55 angle:360]];
-            [dropShadowSprite runAction:[CCRotateBy actionWithDuration:0.55 angle:360]];
-            timer = timer + 300;
-            [ava runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(ava.position.x, winSize.height+80)]];
-            [blackSolid runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(blackSolid.position.x, winSize.height+winSize.height/2+10)]];
+            [self doJump];
+            timer = timer + 50;
         }
     }
     
-    for (CCSprite *asteroid in _trees) {
-        asteroid.position = ccpAdd(asteroid.position, ccpMult(asteroidScrollVel, dt));
-        
-        if (!asteroid.visible) continue;
-        CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x+10, asteroid.boundingBox.origin.y+20, asteroid.boundingBox.size.width-20, asteroid.boundingBox.size.height-20);
-        
-        if (CGRectIntersectsRect(shiprect, asteroidRect)) {
-            asteroid.visible = NO;
-            timer = timer - 500;
-            NSLog(@"%f%@%f", ava.position.y, @" ", winSize.height);
-            if(ava.position.y <= winSize.height - 40){
-                [ava runAction:[CCMoveTo actionWithDuration:1.5 position:ccp(ava.position.x, 0)]];
-                [blackSolid runAction:[CCMoveTo actionWithDuration:1.5 position:ccp(blackSolid.position.x, winSize.height/2)]];
-                [self unschedule:@selector(gameOverSnow)];
-                [_man stopAllActions];
-                dropShadowSprite.visible = FALSE;
-                [trail stopSystem];
-                [self unschedule:@selector(updateScoreTimer)];
-                [self endScene:kEndReasonLose];
-            }else if(ava.position.y <= winSize.height){
-                [ava runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(ava.position.x, winSize.height-40)]];
-                [blackSolid runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(blackSolid.position.x, winSize.height+winSize.height/2-25)]];
-            }else{
-                [ava runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(ava.position.x, winSize.height)]];
-                [blackSolid runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(blackSolid.position.x, winSize.height+winSize.height/2)]];
-            }
+    if(cliff.position.y > winSize.height-160 && cliff.zOrder > 490){
+        [self reorderChild:cliff z:490];
+        cliff.position = ccpSub(cliff.position, ccpMult(asteroidScrollVel, dt));
+    }else if(cliff.zOrder == 490){
+        cliff.position = ccpSub(cliff.position, ccpMult(asteroidScrollVel, dt));
+    }else{
+        cliff.position = ccpAdd(cliff.position, ccpMult(asteroidScrollVel, dt));
+    }
+    
+    for (CCSprite *coin in _coins) {
+        if (!coin.visible) continue;
+        if(coin.position.y > winSize.height-155 && coin.zOrder > 490){
+            [self reorderChild:coin z:490];
+            coin.position = ccpSub(coin.position, ccpMult(asteroidScrollVel, dt));
+        }else if(coin.zOrder == 490){
+            coin.position = ccpSub(coin.position, ccpMult(asteroidScrollVel, dt));
+        }else{
+            coin.position = ccpAdd(coin.position, ccpMult(asteroidScrollVel, dt));
         }
         
-        if (CGRectIntersectsRect(cliffRect, asteroidRect)) {
-            asteroid.visible = NO;
+        CGRect asteroidRect = CGRectMake(coin.boundingBox.origin.x, coin.boundingBox.origin.y, coin.boundingBox.size.width, coin.boundingBox.size.height);
+        
+        if (CGRectIntersectsRect(manrect, asteroidRect) && !hitTime && coin.zOrder > 700) {
+            NSMutableArray *coinArray = [NSMutableArray array];
+            for(int i = 1; i <= 5; ++i) {
+                [coinArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"coins%d.png", i]]];
+            }
+            
+            CCAnimation *coinspin = [CCAnimation animationWithFrames:coinArray delay:0.02f];
+            [coin stopAllActions];
+            [coin runAction:[CCAnimate actionWithAnimation:coinspin restoreOriginalFrame:NO]];
+            
+            coinScore++;
+            NSString *str = [NSString stringWithFormat:@"%i", coinScore];
+            [coinScoreLabel setString:str];
+            if(coinScore == 1000){
+                [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievements100Coins percentComplete:100.0];
+            }
+            [self reorderChild:coin z:700];
+        }
+        
+        if (CGRectIntersectsRect(cliffRect, asteroidRect)  && coin.zOrder > 490 && cliff.zOrder > 490) {
+            coin.visible = NO;
+        }
+    }
+    
+    for (CCSprite *tree in _trees) {
+        if (!tree.visible) continue;
+        if(tree.position.y > winSize.height-120 && tree.zOrder > 490){
+            [self reorderChild:tree z:490];
+            tree.position = ccpSub(tree.position, ccpMult(asteroidScrollVel, dt));
+        }else if(tree.zOrder == 490){
+            tree.position = ccpSub(tree.position, ccpMult(asteroidScrollVel, dt));
+        }else{
+            tree.position = ccpAdd(tree.position, ccpMult(asteroidScrollVel, dt));
+        }
+        
+        CGRect asteroidRect = CGRectMake(tree.boundingBox.origin.x + tree.boundingBox.size.width/2, tree.boundingBox.origin.y, 10, 30);
+        
+        if (CGRectIntersectsRect(shiprect, asteroidRect) && !hitTime && tree.zOrder > 700 && tree.texture == [[CCSprite spriteWithFile:@"tree.png"]texture]) {
+            //[self unscheduleUpdate];
+            NSLog(@"%@", @"hit");
+            [self schedule:@selector(hitTime) interval:1];
+            hitTime = YES;
+            timer = timer/2;
+            [_board stopAllActions];
+            [_man stopAllActions];
+            [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
+            NSMutableArray *fallingArray = [NSMutableArray array];
+            for(int i = 1; i <= 3; ++i) {
+                [fallingArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yetifalling%d.png", i]]];
+            }
+            [self unschedule:@selector(updateBg)];
+            CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
+            [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+            dropShadowSprite.visible = NO;
+            dropShadowBoardSprite.visible = NO;
+            [trail stopSystem];
+            [self unschedule:@selector(updateTimer)];
+            [self unschedule:@selector(updateScoreTimer)];
+            _lives--;
+            fallen = YES;
+            [self reorderChild:tree z:700];
+        }
+        
+        if (CGRectIntersectsRect(cliffRect, asteroidRect) && tree.zOrder > 490 && cliff.zOrder > 490) {
+            //tree.visible = NO;
         }
     }
     
     for (CCSprite *rock in _rocks) {
-        rock.position = ccpAdd(rock.position, ccpMult(asteroidScrollVel, dt));
-        
         if (!rock.visible) continue;
-        CGRect rockRect = CGRectMake(rock.boundingBox.origin.x, rock.boundingBox.origin.y, rock.boundingBox.size.width, rock.boundingBox.size.height);
+        CGRect rockRect = CGRectMake(rock.boundingBox.origin.x+rock.boundingBox.size.width/2, rock.boundingBox.origin.y+rock.boundingBox.size.height/2, 1, 1);
         
-        if (CGRectIntersectsRect(shiprect, rockRect) && _man.position.y == jumpOrigin) {
-            //rock.visible = NO;
-            [[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
+        if (CGRectIntersectsRect(boardrect, rockRect) && _man.position.y == jumpOrigin && rock.zOrder>490) {
+            //[[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
+            [_board stopAllActions];
             [_man stopAllActions];
-            //_man.visible = FALSE;
-            [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-50)]];
-            [_man runAction:[CCRotateBy actionWithDuration:0.4 angle:180]];
-            dropShadowSprite.visible = FALSE;
+            NSMutableArray *fallingArray = [NSMutableArray array];
+            for(int i = 1; i <= 3; ++i) {
+                [fallingArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yetifalling%d.png", i]]];
+            } 
+            CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
+            [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+            [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
+            dropShadowSprite.visible = NO;
+            dropShadowBoardSprite.visible = NO;
+            [self unschedule:@selector(updateBg)];
             [trail stopSystem];
+            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall.plist"];
+            fall.positionType=kCCPositionTypeFree;
+            fall.position=ccp(_man.position.x, _man.position.y);
+            [self addChild:fall];
             [self unschedule:@selector(updateScoreTimer)];
-            [self endScene:kEndReasonLose];
+            fallen = true;
+            dead = TRUE;
         }
-        
         
         for (CCSprite *asteroid in _trees) {
             
             if (!asteroid.visible) continue;
             CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x, asteroid.boundingBox.origin.y, asteroid.boundingBox.size.width, asteroid.boundingBox.size.height);
             
-            if (CGRectIntersectsRect(asteroidRect, rockRect)) {
+            if (CGRectIntersectsRect(asteroidRect, rockRect) && rock.zOrder > 490 && asteroid.zOrder > 490) {
                 asteroid.visible = NO;
             }
         }
         
-        if (CGRectIntersectsRect(cliffRect, rockRect)) {
+        for (CCSprite *asteroid in _spikes) {
+            
+            if (!asteroid.visible) continue;
+            CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x, asteroid.boundingBox.origin.y, asteroid.boundingBox.size.width, asteroid.boundingBox.size.height);
+            
+            if (CGRectIntersectsRect(asteroidRect, rockRect) && rock.zOrder > 490 && asteroid.zOrder > 490) {
+                asteroid.visible = NO;
+            }
+        }
+        
+        CGRect cliffRecter = CGRectMake(cliff.boundingBox.origin.x, cliff.boundingBox.origin.y, cliff.boundingBox.size.width, cliff.boundingBox.size.height);
+        CGRect rockRectCliff = CGRectMake(rock.boundingBox.origin.x, rock.boundingBox.origin.y, rock.boundingBox.size.width, rock.boundingBox.size.height);
+        if (CGRectIntersectsRect(cliffRecter, rockRectCliff) && rock.zOrder > 490 && cliff.zOrder > 490) {
+            NSLog(@"%@", @"rocky cliff");
             rock.visible = NO;
+        }
+        
+        if(rock.position.y > winSize.height-155 && rock.zOrder > 490){
+            [self reorderChild:rock z:490];
+            rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVel, dt));
+        }else if(rock.zOrder == 490){
+            rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVel, dt));
+        }else{
+            rock.position = ccpAdd(rock.position, ccpMult(asteroidScrollVel, dt));
         }
     }
     
     for (CCSprite *spike in _spikes) {
-        spike.position = ccpAdd(spike.position, ccpMult(asteroidScrollVel, dt));
-        
         if (!spike.visible) continue;
-        CGRect spikeRect = CGRectMake(spike.boundingBox.origin.x, spike.boundingBox.origin.y, spike.boundingBox.size.width, spike.boundingBox.size.height);
+        CGRect spikeRect = CGRectMake(spike.boundingBox.origin.x+spike.boundingBox.size.width/2, spike.boundingBox.origin.y+spike.boundingBox.size.height/2, 1, 1);
     
-        if (CGRectIntersectsRect(shiprect, spikeRect) && _man.position.y == jumpOrigin) {
-            [[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
-            //rock.visible = NO;
+        if (CGRectIntersectsRect(boardrect, spikeRect) && _man.position.y == jumpOrigin && spike.zOrder > 490) {
+            //[[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
+            [_board stopAllActions];
             [_man stopAllActions];
-            //_man.visible = FALSE;
-            [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-20)]];
-            [_man runAction:[CCRotateBy actionWithDuration:0.4 angle:180]];
-            dropShadowSprite.visible = FALSE;
+            [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
+            NSMutableArray *fallingArray = [NSMutableArray array];
+            for(int i = 1; i <= 3; ++i) {
+                [fallingArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yetifalling%d.png", i]]];
+            }
+            [self unschedule:@selector(updateBg)];
+            CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
+            [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+            dropShadowSprite.visible = NO;
+            dropShadowBoardSprite.visible = NO;
             [trail stopSystem];
             [self unschedule:@selector(updateScoreTimer)];
-            [self endScene:kEndReasonLose];
+            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall.plist"];
+            fall.positionType=kCCPositionTypeFree;
+            fall.position=ccp(_man.position.x, _man.position.y);
+            [self addChild:fall];
+            fallen = true;
+            dead = TRUE;
         }
         
         for (CCSprite *asteroid in _trees) {
@@ -373,29 +869,193 @@
             if (!asteroid.visible) continue;
             CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x, asteroid.boundingBox.origin.y, asteroid.boundingBox.size.width, asteroid.boundingBox.size.height);
             
-            if (CGRectIntersectsRect(asteroidRect, spikeRect)) {
-                asteroid.visible = NO;
+            if (CGRectIntersectsRect(asteroidRect, spikeRect) && spike.zOrder > 490 && asteroid.zOrder > 490) {
+                spike.visible = NO;
             }
         }
         
-        if (CGRectIntersectsRect(cliffRect, spikeRect)) {
+        CGRect cliffRecter = CGRectMake(cliff.boundingBox.origin.x, cliff.boundingBox.origin.y, cliff.boundingBox.size.width, cliff.boundingBox.size.height);
+        CGRect spikeRectCliff = CGRectMake(spike.boundingBox.origin.x, spike.boundingBox.origin.y, spike.boundingBox.size.width, spike.boundingBox.size.height);
+        if (CGRectIntersectsRect(cliffRecter, spikeRectCliff) && spike.zOrder > 490 && cliff.zOrder > 490) {
             spike.visible = NO;
         }
-    }
     
-    if(_shipPointsPerSecY < 0){
-        [_man setTexture: [[CCSprite spriteWithFile:@"snowboard-left.png"]texture]];
+        if(spike.position.y > winSize.height-155 && spike.zOrder > 490){
+            [self reorderChild:spike z:490];
+            spike.position = ccpSub(spike.position, ccpMult(asteroidScrollVel, dt));
+        }else if(spike.zOrder == 490){
+            spike.position = ccpSub(spike.position, ccpMult(asteroidScrollVel, dt));
+        }else{
+            spike.position = ccpAdd(spike.position, ccpMult(asteroidScrollVel, dt));
+        }
+    
+    }
+        
+        for (CCSprite *ice in _ices) {
+            if (!ice.visible) continue;
+            CGRect iceRect = CGRectMake(ice.boundingBox.origin.x+ice.boundingBox.size.width/2, ice.boundingBox.origin.y+ice.boundingBox.size.height/2, 1, 1);
+            
+            if (CGRectIntersectsRect(boardrect, iceRect) && _man.position.y == jumpOrigin && ice.zOrder > 700) {
+                //[[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
+                timer = timer + 500;
+                [self reorderChild:ice z:700];
+                [self schedule:@selector(slowDown) interval:.5];
+            }
+            
+            for (CCSprite *asteroid in _trees) {
+                
+                if (!asteroid.visible) continue;
+                CGRect asteroidRect = CGRectMake(asteroid.boundingBox.origin.x, asteroid.boundingBox.origin.y, asteroid.boundingBox.size.width, asteroid.boundingBox.size.height);
+                
+                if (CGRectIntersectsRect(asteroidRect, iceRect) && ice.zOrder > 490 && asteroid.zOrder > 490) {
+                    ice.visible = NO;
+                }
+            }
+            
+            CGRect cliffRecter = CGRectMake(cliff.boundingBox.origin.x, cliff.boundingBox.origin.y, cliff.boundingBox.size.width, cliff.boundingBox.size.height);
+            CGRect spikeRectCliff = CGRectMake(ice.boundingBox.origin.x, ice.boundingBox.origin.y, ice.boundingBox.size.width, ice.boundingBox.size.height);
+            if (CGRectIntersectsRect(cliffRecter, spikeRectCliff) && ice.zOrder > 490 && cliff.zOrder > 490) {
+                ice.visible = NO;
+            }
+            
+            if(ice.position.y > winSize.height-155 && ice.zOrder > 490){
+                [self reorderChild:ice z:490];
+                ice.position = ccpSub(ice.position, ccpMult(asteroidScrollVel, dt));
+            }else if(ice.zOrder == 490){
+                ice.position = ccpSub(ice.position, ccpMult(asteroidScrollVel, dt));
+            }else{
+                ice.position = ccpAdd(ice.position, ccpMult(asteroidScrollVel, dt));
+            }
+            
+        }
+        
+        for (CCSprite *arch in _arches) {
+            if (!arch.visible) continue;
+            if(arch.position.y > winSize.height-120 && arch.zOrder > 490){
+                [self reorderChild:arch z:490];
+                arch.position = ccpSub(arch.position, ccpMult(asteroidScrollVel, dt));
+            }else if(arch.zOrder == 490){
+                arch.position = ccpSub(arch.position, ccpMult(asteroidScrollVel, dt));
+            }else{
+                arch.position = ccpAdd(arch.position, ccpMult(asteroidScrollVel, dt));
+            }
+            
+            CGRect archLeftRect = CGRectMake(arch.boundingBox.origin.x + 30, arch.boundingBox.origin.y, 5, 30);
+            CGRect archRightRect = CGRectMake(arch.boundingBox.origin.x + arch.boundingBox.size.width - 35, arch.boundingBox.origin.y, 5, 30);
+            
+            if ((CGRectIntersectsRect(shiprect, archLeftRect) || CGRectIntersectsRect(shiprect, archRightRect)) && !hitTime && arch.zOrder > 700) {
+                //[self unscheduleUpdate];
+                NSLog(@"%@", @"hit");
+                [self schedule:@selector(hitTime) interval:1];
+                hitTime = YES;
+                timer = timer/2;
+                [_board stopAllActions];
+                [_man stopAllActions];
+                [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
+                NSMutableArray *fallingArray = [NSMutableArray array];
+                for(int i = 1; i <= 3; ++i) {
+                    [fallingArray addObject:
+                     [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                      [NSString stringWithFormat:@"yetifalling%d.png", i]]];
+                }
+                [self unschedule:@selector(updateBg)];
+                [self unschedule:@selector(updateTimer)];
+                CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
+                [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+                dropShadowSprite.visible = NO;
+                dropShadowBoardSprite.visible = NO;
+                [trail stopSystem];
+                [self unschedule:@selector(updateScoreTimer)];
+                _lives--;
+                fallen = YES;
+                [self reorderChild:arch z:700];
+            }
+            
+            CGRect cliffRecter = CGRectMake(cliff.boundingBox.origin.x, cliff.boundingBox.origin.y, cliff.boundingBox.size.width, cliff.boundingBox.size.height);
+            CGRect archRecter = CGRectMake(arch.boundingBox.origin.x, arch.boundingBox.origin.y, arch.boundingBox.size.width, arch.boundingBox.size.height);
+            if (CGRectIntersectsRect(cliffRecter, archRecter) && arch.zOrder > 490 && cliff.zOrder > 490) {
+                arch.visible = NO;
+            }
+            
+            for (CCSprite *tree in _trees) {
+                if (!tree.visible) continue;
+                CGRect asteroidRect = CGRectMake(tree.boundingBox.origin.x, tree.boundingBox.origin.y, tree.boundingBox.size.width, tree.boundingBox.size.height);
+                if (CGRectIntersectsRect(asteroidRect, archRecter) && arch.zOrder > 490 && tree.zOrder > 490) {
+                    tree.visible = NO;
+                }
+            }
+            
+            for (CCSprite *spike in _spikes) {
+                if (!spike.visible) continue;
+                CGRect asteroidRect = CGRectMake(spike.boundingBox.origin.x, spike.boundingBox.origin.y, spike.boundingBox.size.width, spike.boundingBox.size.height);
+                if (CGRectIntersectsRect(asteroidRect, archRecter) && arch.zOrder > 490 && spike.zOrder > 490) {
+                    spike.visible = NO;
+                }
+            }
+            
+            for (CCSprite *rock in _rocks) {
+                if (!rock.visible) continue;
+                CGRect asteroidRect = CGRectMake(rock.boundingBox.origin.x, rock.boundingBox.origin.y, rock.boundingBox.size.width, rock.boundingBox.size.height);
+                if (CGRectIntersectsRect(asteroidRect, archRecter) && arch.zOrder > 490 && rock.zOrder > 490) {
+                    rock.visible = NO;
+                }
+            }
+            
+            for (CCSprite *ice in _ices) {
+                if (!ice.visible) continue;
+                CGRect asteroidRect = CGRectMake(ice.boundingBox.origin.x, ice.boundingBox.origin.y, ice.boundingBox.size.width, ice.boundingBox.size.height);
+                if (CGRectIntersectsRect(asteroidRect, archRecter) && arch.zOrder > 490 && ice.zOrder > 490) {
+                    ice.visible = NO;
+                }
+            }
+        }
+    
+    trail.position=ccp(_man.position.x, _man.position.y-10);
+    streak.position=ccp(_man.position.x, _man.position.y-20);
+    
+    if(scoreFlipper == 4){
+        score++;
+        scoreFlipper = 0;
     }else{
-        [_man setTexture: [[CCSprite spriteWithFile:@"snowboard-right.png"]texture]];
+        scoreFlipper++;
     }
-    
-    
-    trail.position=ccp(_man.position.x, _man.position.y-20);
-    
-    //scoreTime++;
-    score++;
     NSString *str = [NSString stringWithFormat:@"%i", (int)score];
     [scoreLabel setString:str];
+    }else{
+        double speedY = .9;
+        double speedX = .6;
+        if(dead){
+            speedY = 1.5;
+            speedX = 1.2;
+        }
+        if(!caught){
+            if(heli.position.y > _man.position.y + 145 && heli.position.x > _man.position.x - 10){
+                heli.position = ccp(heli.position.x - speedX, heli.position.y - speedY);
+                ladder.position = ccp(ladder.position.x - speedX, ladder.position.y - speedY);
+                trapper.position = ccp(trapper.position.x - speedX, trapper.position.y - speedY);
+            }else if(heli.position.y > _man.position.y + 145 && heli.position.x < _man.position.x - 10){
+                heli.position = ccp(heli.position.x + speedX, heli.position.y - speedY);
+                ladder.position = ccp(ladder.position.x + speedX, ladder.position.y - speedY);
+                trapper.position = ccp(trapper.position.x + speedX, trapper.position.y - speedY);
+            }else if(heli.position.y > _man.position.y + 145){
+                heli.position = ccp(heli.position.x, heli.position.y - speedY);
+                ladder.position = ccp(ladder.position.x, ladder.position.y - speedY);
+                trapper.position = ccp(trapper.position.x, trapper.position.y - speedY);
+            }else{
+                caught = YES;
+            }
+        }else{
+            if(_man.position.x < -10 && _man.position.y > winSize.height + _man.boundingBox.size.height){
+                [self unschedule:@selector(updateScoreTimer)];
+                [self endScene:kEndReasonLose];
+            }else{
+                heli.position = ccp(heli.position.x - 1.5, heli.position.y + 1.5);
+                ladder.position = ccp(ladder.position.x  - 1.5, ladder.position.y + 1.5);
+                trapper.position = ccp(trapper.position.x - 1.5, trapper.position.y + 1.5);
+                _man.position = ccp(_man.position.x - 1.5, _man.position.y + 1.5);
+            }
+        }
+    }
 }
 
 - (void)setInvisible:(CCNode *)node {
@@ -410,9 +1070,9 @@
     #define kRestAccelZ -0.6
     #define kShipMaxPointsPerSecWidth (winSize.width*7)
     #define kShipMaxPointsPerSecHeight (winSize.height*0.5)
-    #define kMaxDiffX 0.9
+    #define kMaxDiffX 0.1
     #define kMaxDiffZ 0.3
-    #define kMaxDiffY 0.5
+    #define kMaxDiffY 0.9
     
     UIAccelerationValue rollingX, rollingY, rollingZ;
     
@@ -436,7 +1096,6 @@
     
     _shipPointsPerSecY = pointsPerSec;
     _shipPointsPerSecZ = pointsPerSec2;
-    
 }
 
 - (void)restartTapped:(id)sender {
@@ -487,44 +1146,152 @@
     
     [self unscheduleUpdate];
     
+    [[GameKitHelper sharedGameKitHelper]
+     submitScore:(int64_t)score
+     category:kHighScoreLeaderboardCategory];
+    
 }
 
 -(void)ccTouchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
     CGSize winSize = [CCDirector sharedDirector].winSize;
     
     if(_started == NO){
-        /*[_startLine runAction:[CCSequence actions:
-                             [CCMoveBy actionWithDuration:2 position:ccp(0, winSize.height+100)],[CCCallFuncN actionWithTarget:self selector:@selector(setInvisible:)],nil]];*/
-        [self addChild:trail];
+        [self addChild:trail z:898];
+        [trail resetSystem];
         [self scheduleUpdate];
         [self schedule:@selector(updateTimer) interval:.3];
-        [ava runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(ava.position.x, winSize.height+80)]];
-        [blackSolid runAction:[CCMoveTo actionWithDuration:1.0 position:ccp(blackSolid.position.x, winSize.height+winSize.height/2+10)]];
+        [self schedule:@selector(updateBg) interval:.1];
         _started = YES;
         
     }else{
-        /*
-        _backgroundSpeed = 2000;
-        _randDuration = 1.2;
-         
-        [self schedule:@selector(countPressTime:) interval:1];
-        pressTime = 0;
-         
-         */
-        if(!jumping && _man.position.y == jumpOrigin){
-            [[SimpleAudioEngine sharedEngine] playEffect:@"jump.wav"];
-            jumping = YES;
-            [self schedule:@selector(jumper) interval:.2];
-            [trail stopSystem];
+        if(!jumping && _man.position.y == jumpOrigin && !fallen){
+           /* if(_shipPointsPerSecY > 0){
+                NSMutableArray *punchArray = [NSMutableArray array];
+                for(int i = 1; i <= 3; ++i) {
+                    [punchArray addObject:
+                    [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                    [NSString stringWithFormat:@"yetiPunching%d.png", i]]];
+                }
+                CCAnimation *punch = [CCAnimation animationWithFrames:punchArray delay:0.1f];
+                [_man runAction:[CCAnimate actionWithAnimation:punch restoreOriginalFrame:YES]];
+            }else{
+                NSMutableArray *punchArray = [NSMutableArray array];
+                for(int i = 4; i <= 6; ++i) {
+                    [punchArray addObject:
+                     [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                      [NSString stringWithFormat:@"yetiPunching%d.png", i]]];
+                }
+                CCAnimation *punch = [CCAnimation animationWithFrames:punchArray delay:0.1f];
+                [_man runAction:[CCAnimate actionWithAnimation:punch restoreOriginalFrame:YES]];
+            }
+            
+            for (CCSprite *tree in _trees) {
+                CGRect treeRect = CGRectMake(tree.boundingBox.origin.x, tree.boundingBox.origin.y, tree.boundingBox.size.width, tree.boundingBox.size.height);
+                CGRect manrect = CGRectMake(_man.boundingBox.origin.x, _man.boundingBox.origin.y, _man.boundingBox.size.width, _man.boundingBox.size.height);
+                if (CGRectIntersectsRect(manrect, treeRect) && !hitTime && tree.zOrder > 700) {
+                    NSMutableArray *treeArray = [NSMutableArray array];
+                    for(int i = 1; i <= 3; ++i) {
+                        [treeArray addObject:
+                         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                          [NSString stringWithFormat:@"tree_break%d.png", i]]];
+                    }
+                    CCAnimation *treebreak = [CCAnimation animationWithFrames:treeArray delay:0.05f];
+                    tree.position = ccp(tree.position.x - 45, tree.position.y);
+                    [tree runAction:[CCAnimate actionWithAnimation:treebreak restoreOriginalFrame:NO]];
+                }
+            }*/
+
+        }if(fallen && tapCount < 10 && !caught && !dead){
+            tapCount++;
+            NSMutableArray *getupArray = [NSMutableArray array];
+            for(int i = 1; i <= 3; ++i) {
+                [getupArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yeti_getup%d.png", i]]];
+            }
+            CCAnimation *getup = [CCAnimation animationWithFrames:getupArray delay:0.1f];
+            [_man runAction:[CCAnimate actionWithAnimation:getup restoreOriginalFrame:NO]];
+        }else if(fallen && tapCount == 10){
+            _man.position = ccp(_man.position.x, _man.position.y+40);
+            NSMutableArray *fallingArray = [NSMutableArray array];
+            for(int i = 3; i >= 0; --i) {
+                [fallingArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"yetifalling%d.png", i]]];
+            }
+            CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
+            [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+            [trail resetSystem];
+            hitTime = NO;
+            fallen = NO;
+            dropShadowSprite.visible = YES;
+            dropShadowBoardSprite.visible = YES;
+           // [self scheduleUpdate];
+            [self schedule:@selector(updateTimer) interval:.3];
+            [self schedule:@selector(updateBg) interval:.1];
+            tapCount = 0;
         }
     }
 }
 
+-(void)swipe{
+    if(!jumping && _man.position.y == jumpOrigin && !fallen){
+        _man.scale = 1.1;
+        //[[SimpleAudioEngine sharedEngine] playEffect:@"jump.wav"];
+        jumping = YES;
+        [self schedule:@selector(jumper) interval:.2];
+        [trail stopSystem];
+        
+        [self doJump];
+    }
+}
+
+-(void)doJump{
+    if(_shipPointsPerSecY > 0){
+        NSMutableArray *jumpArray = [NSMutableArray array];
+        for(int i = 1; i <= 5; ++i) {
+            [jumpArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"yetiJumping%d.png", i]]];
+        }
+        
+        leftturn = [CCAnimation animationWithFrames:jumpArray delay:0.1f];
+        [_man runAction:[CCAnimate actionWithAnimation:leftturn restoreOriginalFrame:YES]];
+        
+        NSMutableArray *rightboardturnArray = [NSMutableArray array];
+        for(int i = 5; i >= 1; --i) {
+            [rightboardturnArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"board_jumping%d.png", i]]];
+        }
+        
+        boardrightturn = [CCAnimation animationWithFrames:rightboardturnArray delay:0.1f];
+        [_board runAction:[CCAnimate actionWithAnimation:boardrightturn restoreOriginalFrame:YES]];
+    }else{
+        NSMutableArray *jumpArray = [NSMutableArray array];
+        for(int i = 1; i <= 5; ++i) {
+            [jumpArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"yetiJumpingleft%d.png", i]]];
+        }
+        
+        leftturn = [CCAnimation animationWithFrames:jumpArray delay:0.1f];
+        [_man runAction:[CCAnimate actionWithAnimation:leftturn restoreOriginalFrame:YES]];
+        
+        NSMutableArray *rightboardturnArray = [NSMutableArray array];
+        for(int i = 5; i >= 1; --i) {
+            [rightboardturnArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"board_jumpingleft%d.png", i]]];
+        }
+        
+        boardrightturn = [CCAnimation animationWithFrames:rightboardturnArray delay:0.1f];
+        [_board runAction:[CCAnimate actionWithAnimation:boardrightturn restoreOriginalFrame:YES]];
+    }
+}
+
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    /*
-    _backgroundSpeed = 1000;
-    _randDuration = 2.4;
-     */
+
 }
 
 -(void)jumper{
@@ -534,67 +1301,38 @@
 
 -(void)updateTimer{
     if(timer < 0){
-        timer = timer + 200;
+        timer = timer + 70;
+    }else if(timer > 0 && timer < 200){
+        timer = timer + 10;
+    }else if(timer > 200 && timer < 400){
+        timer = timer + 7;
+    }else if(timer > 400 && timer < 600){
+        timer = timer + 4;
+    }else if(timer > 600 && timer < 800){
+        timer = timer + 2;
     }else{
-        timer = timer + 20;
+        timer = timer + 1;
     }
 }
 
--(void)hideSnow{
-    [self unschedule:@selector(halfSnow)];
-    [self unschedule:@selector(fullSnow)];
-    [self unschedule:@selector(gameOverSnow)];
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    if(ava.position.y < winSize.height + 100){
-        ava.position = ccp(ava.position.x, ava.position.y + 1);
-    }else{
-        [self unschedule:@selector(hideSnow)];
-    }
-
-}
-
--(void)halfSnow{
-    [self unschedule:@selector(hideSnow)];
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    if(ava.position.y > winSize.height){
-        ava.position = ccp(ava.position.x, ava.position.y - 1);
-    }else{
-        [self unschedule:@selector(halfSnow)];
+-(void)updateBg{
+    if(bg.texture == [[CCSprite spriteWithFile:@"hill1.png"]texture]){
+        [bg setTexture:[[CCSprite spriteWithFile:@"hill2.png"]texture]];
+    }else if(bg.texture == [[CCSprite spriteWithFile:@"hill2.png"]texture]){
+        [bg setTexture:[[CCSprite spriteWithFile:@"hill3.png"]texture]];
+    }else if(bg.texture == [[CCSprite spriteWithFile:@"hill3.png"]texture]){
+        [bg setTexture:[[CCSprite spriteWithFile:@"hill1.png"]texture]];
     }
 }
 
--(void)fullSnow{
-    [self unschedule:@selector(hideSnow)];
-    [self unschedule:@selector(halfSnow)];
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    if(ava.position.y > winSize.height - 50){
-        blackSolid.position = ccp(blackSolid.position.x,blackSolid.position.y-1);
-        ava.position = ccp(ava.position.x, ava.position.y - 1);
-    }else{
-        [self unschedule:@selector(fullSnow)];
-    }
+-(void)hitTime{
+    hitTime = NO;
+    [self unschedule:@selector(hitTime)];
 }
 
--(void)gameOverSnow{
-    [self unschedule:@selector(hideSnow)];
-    [self unschedule:@selector(fullSnow)];
-    if(ava.position.y > 0){
-        NSLog(@"%f", blackSolid.position.y);
-        blackSolid.position = ccp(blackSolid.position.x,blackSolid.position.y-5);
-        ava.position = ccp(ava.position.x, ava.position.y - 5);
-    }else{
-        
-
-    }
-}
-
--(void)countPressTime:(ccTime)dt {
-    pressTime++;
-    
-    if ( pressTime == 5 ) {    //If user tapped and hold for 5 seconds...
-        NSLog(@"%@", @"Held");
-    }
-    
+-(void)slowDown{
+    timer = timer - 500;
+    [self unschedule:@selector(slowDown)];
 }
 
 // on "dealloc" you need to release all your retained objects

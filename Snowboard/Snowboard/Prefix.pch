@@ -11,4 +11,9 @@
 #ifdef __OBJC__
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import "GameKitHelper.h"
+#import "TestFlight.h"
 #endif
+
+#define kHighScoreLeaderboardCategory @"HighScores"
+#define kAchievements100Coins @"100Coins"
