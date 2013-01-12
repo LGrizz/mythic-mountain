@@ -16,4 +16,11 @@
 #endif
 
 #define kHighScoreLeaderboardCategory @"HighScores"
-#define kAchievements100Coins @"100Coins"
+#define kAchievementsTrainingWheels @"trainingwheels"
+#define kAchievementsChumbawumba @"getbackup"
+#define kAchievementsDistanceOne @"distanceone"
+#define kAchievementsDistanceTwo @"distancetwo"
+#define kAchievementsDistanceThree @"distancethree"
+#define kAchievementsCoinOne @"coinone"
+#define kAchievementsCoinTwo @"cointwo"
+#define kAchievementsCoinThree @"cointhree"

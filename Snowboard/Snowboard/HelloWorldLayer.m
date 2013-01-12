@@ -12,6 +12,7 @@
 #import "CCParallaxNode-Extras.h"
 #import "SimpleAudioEngine.h"
 #import "CCGestureRecognizer.h"
+#import "MainMenuScene.h"
 
 #define kNumTrees 20
 #define kNumRocks 5
@@ -47,6 +48,14 @@
         recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UISwipeGestureRecognizer alloc]init] autorelease] target:self action:@selector(swipe)];
         ((UISwipeGestureRecognizer*)recognizer.gestureRecognizer).direction = UISwipeGestureRecognizerDirectionUp;
         [self addGestureRecognizer:recognizer];
+
+        recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UISwipeGestureRecognizer alloc]init] autorelease] target:self action:@selector(swipeJump)];
+        ((UISwipeGestureRecognizer*)recognizer.gestureRecognizer).direction = UISwipeGestureRecognizerDirectionLeft;
+        [self addGestureRecognizer:recognizer];
+        
+        recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UISwipeGestureRecognizer alloc]init] autorelease] target:self action:@selector(swipeJump)];
+        ((UISwipeGestureRecognizer*)recognizer.gestureRecognizer).direction = UISwipeGestureRecognizerDirectionRight;
+        [self addGestureRecognizer:recognizer];
         
         hitTime = NO;
         fallen = NO;
@@ -56,6 +65,10 @@
         caught = NO;
         dead = NO;
         scoreFlipper = 0;
+        bigJump = NO;
+        hitJump = NO;
+        tricker = NO;
+        ySpeed = 0;
         self.isTouchEnabled = YES;
         
         //Character Animations
@@ -83,6 +96,10 @@
         CCSpriteBatchNode *punchSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_punch.png"];
         [punchSheet.texture setAliasTexParameters];
         [self addChild:punchSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_cage.plist"];
+        CCSpriteBatchNode *cageSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_cage.png"];
+        [cageSheet.texture setAliasTexParameters];
+        [self addChild:cageSheet];
         
         //Board Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardturn.plist"];
@@ -125,6 +142,10 @@
         CCSpriteBatchNode *trapperSheet = [CCSpriteBatchNode batchNodeWithFile:@"trapper.png"];
         [trapperSheet.texture setAliasTexParameters];
         [self addChild:trapperSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"gameovertrapper.plist"];
+        CCSpriteBatchNode *gameovertrapperSheet = [CCSpriteBatchNode batchNodeWithFile:@"gameovertrapper.png"];
+        [gameovertrapperSheet.texture setAliasTexParameters];
+        [self addChild:gameovertrapperSheet];
         
         
         _man = [CCSprite spriteWithFile:@"yetiTurning01.png"];  // 4
@@ -174,7 +195,7 @@
               [NSString stringWithFormat:@"heli%d.png", i]]];
         }
         
-        CCAnimation *helispin = [CCAnimation animationWithFrames:heliArray delay:0.1f];
+        CCAnimation *helispin = [CCAnimation animationWithFrames:heliArray delay:0.2f];
         [heli runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:helispin restoreOriginalFrame:NO]]];
         
         ladder = [CCSprite spriteWithFile:@"ladder1.png"];
@@ -187,7 +208,7 @@
               [NSString stringWithFormat:@"ladder%d.png", i]]];
         }
         
-        CCAnimation *laddershake = [CCAnimation animationWithFrames:ladderArray delay:0.1f];
+        CCAnimation *laddershake = [CCAnimation animationWithFrames:ladderArray delay:0.2f];
         [ladder runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:laddershake restoreOriginalFrame:NO]]];
         
         trapper = [CCSprite spriteWithFile:@"trapper_heli1.png"];
@@ -200,7 +221,7 @@
               [NSString stringWithFormat:@"trapper_heli%d.png", i]]];
         }
         
-        CCAnimation *trappershake = [CCAnimation animationWithFrames:trapperArray delay:0.1f];
+        CCAnimation *trappershake = [CCAnimation animationWithFrames:trapperArray delay:0.2f];
         [trapper runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:trappershake restoreOriginalFrame:NO]]];
         
         // 1) Create the CCParallaxNode
@@ -320,7 +341,7 @@
         scoreTime = 0;
         coinScore = 0;
         
-        CCLabelTTF *scoreDistanceLabel = [CCLabelBMFont labelWithString:@"d" fntFile:@"distance_24pt.fnt"];
+        CCLabelTTF *scoreDistanceLabel = [CCLabelBMFont labelWithString:@"y" fntFile:@"distance_24pt.fnt"];
         scoreDistanceLabel.position = ccp(winSize.width-18, 25);
         [self addChild:scoreDistanceLabel z:999];
         
@@ -366,6 +387,7 @@
 - (void)update:(ccTime)dt {
     CGPoint backgroundScrollVel = ccp(0, _backgroundSpeed);
     CGPoint asteroidScrollVel = ccp(0, _backgroundSpeed/3.4);
+    CGPoint asteroidScrollVelDown = ccp(0, _backgroundSpeed/12);
     
     _backgroundNode.position = ccpAdd(_backgroundNode.position, ccpMult(backgroundScrollVel, dt));
     
@@ -409,23 +431,41 @@
     newX = MIN(MAX(newX, minX), maxX);
     
     if(!jumping){
-        if(_man.position.y == jumpOrigin + 32){
-            _man.position = ccp(newX, _man.position.y - 2);
-            _board.position = ccp(newX, _board.position.y - 2);
+        if(_man.position.y < jumpOrigin + 32 && _man.position.y > jumpOrigin + 25){
+            ySpeed += 0.2f;
+            _man.position = ccp(newX, _man.position.y - ySpeed);
+            _board.position = ccp(newX, _board.position.y - ySpeed);
             [trail resetSystem];
         }else if(_man.position.y > jumpOrigin){
+            ySpeed += 0.2f;
             _man.scale = 1.04;
-            _man.position = ccp(newX, _man.position.y - 2);
-            _board.position = ccp(newX, _board.position.y - 2);
+            _man.position = ccp(newX, _man.position.y - ySpeed);
+            _board.position = ccp(newX, _board.position.y - ySpeed);
+        }else if(_man.position.y < jumpOrigin){
+            _man.position = ccp(newX, jumpOrigin);
+            _board.position = ccp(newX, jumpOrigin);
         }else{
+            tricker = NO;
             _man.scale = 1;
             _man.position = ccp(newX, _man.position.y);
             _board.position = ccp(newX, _board.position.y);
         }
-    }else{
+    }else if(bigJump && _man.position.y > jumpOrigin + 110){
+        jumping = NO;
+        bigJump = NO;
+        ySpeed = 2;
+        timer = timer - 200;
+    }else if(bigJump){
+        if(ySpeed > .5)
+            ySpeed -= 0.3f;
         _man.scale = 1.09;
-        _man.position = ccp(newX, _man.position.y + 4);
-        _board.position = ccp(newX, _board.position.y + 4);
+        _man.position = ccp(newX, _man.position.y + ySpeed);
+        _board.position = ccp(newX, _board.position.y + ySpeed);
+    }else{
+        ySpeed -= 0.2f;
+        _man.scale = 1.09;
+        _man.position = ccp(newX, _man.position.y + ySpeed);
+        _board.position = ccp(newX, _board.position.y + ySpeed);
     }
         
         if(_shipPointsPerSecY < 0 && _previousPointsPerSec >= 0 && _man.position.y == jumpOrigin){
@@ -482,7 +522,7 @@
     double curTime = CACurrentMediaTime();
     _backgroundSpeed = 840 + timer;
 
-    if (curTime > _nextAsteroidSpawn) {
+    if (curTime > _nextAsteroidSpawn && !bigJump) {
         CCSprite *newTree = [CCSprite spriteWithFile:@"tree.png"];
         
         float randSecs = [self randomValueBetween:450/_backgroundSpeed andValue:750/_backgroundSpeed];
@@ -498,7 +538,7 @@
                 _nextAsteroid = 0;
         
         [asteroid1 stopAllActions];
-        asteroid1.position = ccp(randX-20, -100);
+        asteroid1.position = ccp(randX-20, -150);
         [self reorderChild:asteroid1 z:901];
         [asteroid1 setDisplayFrame:newTree.displayedFrame];
         [asteroid1 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
@@ -513,7 +553,7 @@
                 _nextAsteroid = 0;
             
             [asteroid2 stopAllActions];
-            asteroid2.position = ccp(randX + (10 + (randTree/2)), -100);
+            asteroid2.position = ccp(randX + (10 + (randTree/2)), -150);
             [self reorderChild:asteroid2 z:901];
             [asteroid2 setDisplayFrame:newTree.displayedFrame];
             [asteroid2 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
@@ -529,7 +569,7 @@
                 _nextAsteroid = 0;
             
             [asteroid2 stopAllActions];
-            asteroid2.position = ccp(randX, -100 + (10 + (randTree/2)));
+            asteroid2.position = ccp(randX, -150 + (10 + (randTree/2)));
             [self reorderChild:asteroid2 z:901];
             [asteroid2 setDisplayFrame:newTree.displayedFrame];
             [asteroid2 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
@@ -542,7 +582,7 @@
                 _nextAsteroid = 0;
         
             [asteroid3 stopAllActions];
-            asteroid3.position = ccp(randX + (10 + (randTree/2)), -100);
+            asteroid3.position = ccp(randX + (10 + (randTree/2)), -150);
             [self reorderChild:asteroid3 z:901];
             [asteroid3 setDisplayFrame:newTree.displayedFrame];
             [asteroid3 setTexture:[[CCSprite spriteWithFile:@"tree.png"]texture]];
@@ -550,7 +590,7 @@
         }
     }
     
-    if (curTime > _nextRockSpawn && score > 300) {
+    if (curTime > _nextRockSpawn && score > 300 && !bigJump) {
         
         float randSecs = [self randomValueBetween:1000/_backgroundSpeed andValue:2500/_backgroundSpeed];
         _nextRockSpawn = randSecs + curTime;
@@ -567,7 +607,7 @@
         rock.visible = YES;
     }
         
-    if (curTime > _nextIceSpawn && score > 700) {
+    if (curTime > _nextIceSpawn && score > 700 && !bigJump) {
             
         float randSecs = [self randomValueBetween:4000/_backgroundSpeed andValue:6000/_backgroundSpeed];
         _nextIceSpawn = randSecs + curTime;
@@ -584,7 +624,7 @@
         ice.visible = YES;
     }
     
-    if (curTime > _nextSpikeSpawn && score > 1200) {
+    if (curTime > _nextSpikeSpawn && score > 1200 && !bigJump) {
         
         float randSecs = [self randomValueBetween:3000/_backgroundSpeed andValue:5000/_backgroundSpeed];
         _nextSpikeSpawn = randSecs + curTime;
@@ -601,7 +641,7 @@
         spike.visible = YES;
     }
         
-    if (curTime > _nextArchSpawn && score > 100) {
+    if (curTime > _nextArchSpawn && score > 100 && !bigJump) {
             
         float randSecs = [self randomValueBetween:5000/_backgroundSpeed andValue:7000/_backgroundSpeed];
         _nextArchSpawn = randSecs + curTime;
@@ -613,12 +653,12 @@
         if (_nextArch >= _arches.count) _nextArch = 0;
             
         [arch stopAllActions];
-        arch.position = ccp(randX, -100);
+        arch.position = ccp(randX, -150);
         [self reorderChild:arch z:901];
         arch.visible = YES;
     }
     
-    if (curTime > _nextCoinSpawn) {
+    if (curTime > _nextCoinSpawn && !bigJump) {
         
         float randSecs = [self randomValueBetween:100/_backgroundSpeed andValue:500/_backgroundSpeed];
         _nextCoinSpawn = randSecs + curTime;
@@ -644,7 +684,7 @@
         [coin runAction:[CCRepeat actionWithAction:[CCAnimate actionWithAnimation:coinspin restoreOriginalFrame:NO] times:2]];
     }
     
-    if (curTime > _nextCliffSpawn) {
+    if (curTime > _nextCliffSpawn && !bigJump) {
         
         float randSecs = [self randomValueBetween:5000/_backgroundSpeed andValue:10000/_backgroundSpeed];
         _nextCliffSpawn = randSecs + curTime;
@@ -657,6 +697,15 @@
         cliff.visible = YES;
     }
     
+    if(bigJump && hitJump){
+        bigCliff = [CCSprite spriteWithFile:@"jump.png"];
+        hitJump = NO;
+        bigCliff.position = ccp(winSize.width/2, -400);
+        [self addChild:bigCliff z:898];
+        bigCliff.visible = YES;
+    }
+    
+    CGRect bigCliffRect = CGRectMake(bigCliff.boundingBox.origin.x, bigCliff.boundingBox.origin.y+40, bigCliff.boundingBox.size.width, 1);
     CGRect cliffRect = CGRectMake(cliff.boundingBox.origin.x, cliff.boundingBox.origin.y+40, cliff.boundingBox.size.width, 1);
     CGRect shiprect = CGRectMake(_man.boundingBox.origin.x+_man.boundingBox.size.width/2, _man.boundingBox.origin.y+_man.boundingBox.size.height/2, _man.boundingBox.size.width/4, _man.boundingBox.size.height/8);
     CGRect manrect = CGRectMake(_man.boundingBox.origin.x, _man.boundingBox.origin.y, _man.boundingBox.size.width, _man.boundingBox.size.height);
@@ -669,26 +718,46 @@
             [self schedule:@selector(jumper) interval:.2];
             [trail stopSystem];
             [self doJump];
+            ySpeed = 4;
             timer = timer + 50;
+        }
+    }
+        
+    if (CGRectIntersectsRect(shiprect, bigCliffRect) && _man.position.y == jumpOrigin && bigCliff.zOrder > 490) {
+        if(!jumping && _man.position.y == jumpOrigin){
+            jumping = YES;
+            [trail stopSystem];
+            [self doJump];
+            ySpeed = 8;
+            tricker = YES;
         }
     }
     
     if(cliff.position.y > winSize.height-160 && cliff.zOrder > 490){
         [self reorderChild:cliff z:490];
-        cliff.position = ccpSub(cliff.position, ccpMult(asteroidScrollVel, dt));
+        cliff.position = ccpSub(cliff.position, ccpMult(asteroidScrollVelDown, dt));
     }else if(cliff.zOrder == 490){
-        cliff.position = ccpSub(cliff.position, ccpMult(asteroidScrollVel, dt));
+        cliff.position = ccpSub(cliff.position, ccpMult(asteroidScrollVelDown, dt));
     }else{
         cliff.position = ccpAdd(cliff.position, ccpMult(asteroidScrollVel, dt));
+    }
+        
+    if(bigCliff.position.y > winSize.height-160 && bigCliff.zOrder > 490){
+        [self reorderChild:bigCliff z:490];
+        bigCliff.position = ccpSub(bigCliff.position, ccpMult(asteroidScrollVelDown, dt));
+    }else if(bigCliff.zOrder == 490){
+        bigCliff.position = ccpSub(bigCliff.position, ccpMult(asteroidScrollVelDown, dt));
+    }else{
+        bigCliff.position = ccpAdd(bigCliff.position, ccpMult(asteroidScrollVel, dt));
     }
     
     for (CCSprite *coin in _coins) {
         if (!coin.visible) continue;
         if(coin.position.y > winSize.height-155 && coin.zOrder > 490){
             [self reorderChild:coin z:490];
-            coin.position = ccpSub(coin.position, ccpMult(asteroidScrollVel, dt));
+            coin.position = ccpSub(coin.position, ccpMult(asteroidScrollVelDown, dt));
         }else if(coin.zOrder == 490){
-            coin.position = ccpSub(coin.position, ccpMult(asteroidScrollVel, dt));
+            coin.position = ccpSub(coin.position, ccpMult(asteroidScrollVelDown, dt));
         }else{
             coin.position = ccpAdd(coin.position, ccpMult(asteroidScrollVel, dt));
         }
@@ -710,8 +779,12 @@
             coinScore++;
             NSString *str = [NSString stringWithFormat:@"%i", coinScore];
             [coinScoreLabel setString:str];
-            if(coinScore == 1000){
-                [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievements100Coins percentComplete:100.0];
+            if(coinScore == 100){
+                [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsCoinOne percentComplete:100.0];
+            }else if(coinScore == 500){
+                [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsCoinTwo percentComplete:100.0];
+            }else if(coinScore == 1000){
+                [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsCoinThree percentComplete:100.0];
             }
             [self reorderChild:coin z:700];
         }
@@ -725,9 +798,9 @@
         if (!tree.visible) continue;
         if(tree.position.y > winSize.height-120 && tree.zOrder > 490){
             [self reorderChild:tree z:490];
-            tree.position = ccpSub(tree.position, ccpMult(asteroidScrollVel, dt));
+            tree.position = ccpSub(tree.position, ccpMult(asteroidScrollVelDown, dt));
         }else if(tree.zOrder == 490){
-            tree.position = ccpSub(tree.position, ccpMult(asteroidScrollVel, dt));
+            tree.position = ccpSub(tree.position, ccpMult(asteroidScrollVelDown, dt));
         }else{
             tree.position = ccpAdd(tree.position, ccpMult(asteroidScrollVel, dt));
         }
@@ -739,7 +812,6 @@
             NSLog(@"%@", @"hit");
             [self schedule:@selector(hitTime) interval:1];
             hitTime = YES;
-            timer = timer/2;
             [_board stopAllActions];
             [_man stopAllActions];
             [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
@@ -759,6 +831,10 @@
             [self unschedule:@selector(updateScoreTimer)];
             _lives--;
             fallen = YES;
+            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall2.plist"];
+            fall.positionType=kCCPositionTypeFree;
+            fall.position=ccp(_man.position.x, _man.position.y-20);
+            [self addChild:fall z:899];
             [self reorderChild:tree z:700];
         }
         
@@ -786,12 +862,12 @@
             [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
             dropShadowSprite.visible = NO;
             dropShadowBoardSprite.visible = NO;
+            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall2.plist"];
+            fall.positionType=kCCPositionTypeFree;
+            fall.position=ccp(_man.position.x, _man.position.y-20);
+            [self addChild:fall z:899];
             [self unschedule:@selector(updateBg)];
             [trail stopSystem];
-            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall.plist"];
-            fall.positionType=kCCPositionTypeFree;
-            fall.position=ccp(_man.position.x, _man.position.y);
-            [self addChild:fall];
             [self unschedule:@selector(updateScoreTimer)];
             fallen = true;
             dead = TRUE;
@@ -826,9 +902,9 @@
         
         if(rock.position.y > winSize.height-155 && rock.zOrder > 490){
             [self reorderChild:rock z:490];
-            rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVel, dt));
+            rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVelDown, dt));
         }else if(rock.zOrder == 490){
-            rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVel, dt));
+            rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVelDown, dt));
         }else{
             rock.position = ccpAdd(rock.position, ccpMult(asteroidScrollVel, dt));
         }
@@ -856,10 +932,10 @@
             dropShadowBoardSprite.visible = NO;
             [trail stopSystem];
             [self unschedule:@selector(updateScoreTimer)];
-            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall.plist"];
+            ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall2.plist"];
             fall.positionType=kCCPositionTypeFree;
-            fall.position=ccp(_man.position.x, _man.position.y);
-            [self addChild:fall];
+            fall.position=ccp(_man.position.x, _man.position.y-20);
+            [self addChild:fall z:899];
             fallen = true;
             dead = TRUE;
         }
@@ -882,9 +958,9 @@
     
         if(spike.position.y > winSize.height-155 && spike.zOrder > 490){
             [self reorderChild:spike z:490];
-            spike.position = ccpSub(spike.position, ccpMult(asteroidScrollVel, dt));
+            spike.position = ccpSub(spike.position, ccpMult(asteroidScrollVelDown, dt));
         }else if(spike.zOrder == 490){
-            spike.position = ccpSub(spike.position, ccpMult(asteroidScrollVel, dt));
+            spike.position = ccpSub(spike.position, ccpMult(asteroidScrollVelDown, dt));
         }else{
             spike.position = ccpAdd(spike.position, ccpMult(asteroidScrollVel, dt));
         }
@@ -920,9 +996,9 @@
             
             if(ice.position.y > winSize.height-155 && ice.zOrder > 490){
                 [self reorderChild:ice z:490];
-                ice.position = ccpSub(ice.position, ccpMult(asteroidScrollVel, dt));
+                ice.position = ccpSub(ice.position, ccpMult(asteroidScrollVelDown, dt));
             }else if(ice.zOrder == 490){
-                ice.position = ccpSub(ice.position, ccpMult(asteroidScrollVel, dt));
+                ice.position = ccpSub(ice.position, ccpMult(asteroidScrollVelDown, dt));
             }else{
                 ice.position = ccpAdd(ice.position, ccpMult(asteroidScrollVel, dt));
             }
@@ -933,9 +1009,9 @@
             if (!arch.visible) continue;
             if(arch.position.y > winSize.height-120 && arch.zOrder > 490){
                 [self reorderChild:arch z:490];
-                arch.position = ccpSub(arch.position, ccpMult(asteroidScrollVel, dt));
+                arch.position = ccpSub(arch.position, ccpMult(asteroidScrollVelDown, dt));
             }else if(arch.zOrder == 490){
-                arch.position = ccpSub(arch.position, ccpMult(asteroidScrollVel, dt));
+                arch.position = ccpSub(arch.position, ccpMult(asteroidScrollVelDown, dt));
             }else{
                 arch.position = ccpAdd(arch.position, ccpMult(asteroidScrollVel, dt));
             }
@@ -1021,6 +1097,32 @@
     }
     NSString *str = [NSString stringWithFormat:@"%i", (int)score];
     [scoreLabel setString:str];
+    if(score == 1000){
+        [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsDistanceOne percentComplete:100.0];
+    }else if(score == 5000){
+        [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsDistanceTwo percentComplete:100.0];
+    }else if(score == 10000){
+        [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsDistanceThree percentComplete:100.0];
+    }
+    
+    
+    if(score == 300){
+        bigJump = YES;
+        hitJump = YES;
+    }else if(score == 700){
+        bigJump = YES;
+        hitJump = YES;
+    }else if(score == 1200){
+        bigJump = YES;
+        hitJump = YES;
+    }else if(score == 2100){
+        bigJump = YES;
+        hitJump = YES;
+    }else if(score == 3000){
+        bigJump = YES;
+        hitJump = YES;
+    }   
+        
     }else{
         double speedY = .9;
         double speedX = .6;
@@ -1045,7 +1147,7 @@
                 caught = YES;
             }
         }else{
-            if(_man.position.x < -10 && _man.position.y > winSize.height + _man.boundingBox.size.height){
+            if(_man.position.x < -10 && _man.position.y > winSize.height){
                 [self unschedule:@selector(updateScoreTimer)];
                 [self endScene:kEndReasonLose];
             }else{
@@ -1099,7 +1201,15 @@
 }
 
 - (void)restartTapped:(id)sender {
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionZoomFlipX transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];   
+    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
+}
+
+- (void)achievementsTapped:(id)sender {
+    [[GameKitHelper sharedGameKitHelper] showAchievements];
+}
+
+- (void)mainmenuTapped:(id)sender {
+    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[MainMenuScene scene]]];
 }
 
 - (void)endScene:(EndReason)endReason {
@@ -1109,40 +1219,92 @@
     
     CGSize winSize = [CCDirector sharedDirector].winSize;
     
-    NSString *message;
-    if (endReason == kEndReasonWin) {
-        message = @"You win!";
-    } else if (endReason == kEndReasonLose) {
-        message = @"You lose!";
+    CCLayer *gameOverLayer = [CCLayer node];
+    
+    CCSprite *gameoverBg = [CCSprite spriteWithFile:@"gameoverBg.png"];
+    gameoverBg.anchorPoint = ccp(0.0f,1.0f);
+    gameoverBg.position = ccp(0, winSize.height);
+    gameoverBg.opacity = 130;
+    [gameOverLayer addChild:gameoverBg z:990];
+    
+    CCSprite *gameoverTrapper = [CCSprite spriteWithFile:@"gameovertrapper1.png"];
+    gameoverTrapper.position = ccp(115, winSize.height-155);
+    [gameoverTrapper.texture setAliasTexParameters];
+    [gameOverLayer addChild:gameoverTrapper z:995];
+    
+    NSMutableArray *gameovertrapperArray = [NSMutableArray array];
+    for(int i = 1; i <= 4; ++i) {
+        [gameovertrapperArray addObject:
+         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+          [NSString stringWithFormat:@"trapper%d.png", i]]];
     }
+    
+    CCAnimation *gameovertrapperpump = [CCAnimation animationWithFrames:gameovertrapperArray delay:0.1f];
+    [gameoverTrapper runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:gameovertrapperpump restoreOriginalFrame:NO]]];
+    
+    CCSprite *gameoverCage = [CCSprite spriteWithFile:@"yeti_cage1.png"];
+    gameoverCage.position = ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2);
+    [gameoverCage.texture setAliasTexParameters];
+    [gameOverLayer addChild:gameoverCage z:996];
+    
+    NSMutableArray *gameoverCageArray = [NSMutableArray array];
+    for(int i = 1; i <= 2; ++i) {
+        [gameoverCageArray addObject:
+         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+          [NSString stringWithFormat:@"yeti_cage%d.png", i]]];
+    }
+    
+    CCAnimation *cageShake = [CCAnimation animationWithFrames:gameoverCageArray delay:0.1f];
+    [gameoverCage runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:cageShake restoreOriginalFrame:NO]]];
     
     CCLabelBMFont *label;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        label = [CCLabelBMFont labelWithString:message fntFile:@"Arial-hd.fnt"];
-    } else {
-        label = [CCLabelBMFont labelWithString:message fntFile:@"Arial.fnt"];
-    }
-    label.scale = 0.1;
-    label.position = ccp(winSize.width/2, winSize.height * 0.6);
-    [self addChild:label z:999];
+    label = [CCLabelBMFont labelWithString:@"GAME OVER" fntFile:@"game_over40pt.fnt"];
+    label.position = ccp(winSize.width/2, winSize.height - 250);
+    [gameOverLayer addChild:label z:999];
     
-    CCLabelBMFont *restartLabel;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        restartLabel = [CCLabelBMFont labelWithString:@"Restart" fntFile:@"Arial-hd.fnt"];    
-    } else {
-        restartLabel = [CCLabelBMFont labelWithString:@"Restart" fntFile:@"Arial.fnt"];    
-    }
+    CCLabelBMFont *yards;
+    yards = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"You made it %d yards", (int)score] fntFile:@"game_over_dist_coins16pt.fnt"];
+    yards.position = ccp(winSize.width/2, winSize.height - 282);
+    [gameOverLayer addChild:yards z:997];
+    CCLabelBMFont *coins;
+    coins = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"You collected %d coins", (int)coinScore] fntFile:@"game_over_dist_coins16pt.fnt"];
+    coins.position = ccp(winSize.width/2, winSize.height - 302);
+    [gameOverLayer addChild:coins z:997];
     
-    CCMenuItemLabel *restartItem = [CCMenuItemLabel itemWithLabel:restartLabel target:self selector:@selector(restartTapped:)];
-    restartItem.scale = 0.1;
-    restartItem.position = ccp(winSize.width/2, winSize.height * 0.4);
+    CCSprite *fb = [CCSprite spriteWithFile:@"facebook.png"];
+    fb.position = ccp(winSize.width/2 + 15, winSize.height - 330);
+    [gameOverLayer addChild:fb z:997];
     
-    CCMenu *menu = [CCMenu menuWithItems:restartItem, nil];
+    CCSprite *twitter = [CCSprite spriteWithFile:@"twitter.png"];
+    twitter.position = ccp(winSize.width/2 - 15, winSize.height - 330);
+    [gameOverLayer addChild:twitter z:997];
+    
+    CCLabelBMFont *playagain;
+    playagain = [CCLabelBMFont labelWithString:@"PLAY AGAIN" fntFile:@"game_over_menu28pt.fnt"];
+    CCLabelBMFont *spendcoins;
+    spendcoins = [CCLabelBMFont labelWithString:@"SPEND COINS" fntFile:@"game_over_menu28pt.fnt"];
+    CCLabelBMFont *achievements;
+    achievements = [CCLabelBMFont labelWithString:@"ACHIEVEMENTS" fntFile:@"game_over_menu28pt.fnt"];
+    CCLabelBMFont *mainmenu;
+    mainmenu = [CCLabelBMFont labelWithString:@"MAIN MENU" fntFile:@"game_over_menu28pt.fnt"];
+    
+    CCMenuItemLabel *playagainItem = [CCMenuItemLabel itemWithLabel:playagain target:self selector:@selector(restartTapped:)];
+    playagainItem.position = ccp(winSize.width/2, winSize.height - 370);
+    CCMenuItemLabel *spendcoinsItem = [CCMenuItemLabel itemWithLabel:spendcoins target:self selector:@selector(restartTapped:)];
+    spendcoinsItem.position = ccp(winSize.width/2, winSize.height - 400);
+    CCMenuItemLabel *achievementsItem = [CCMenuItemLabel itemWithLabel:achievements target:self selector:@selector(achievementsTapped:)];
+    achievementsItem.position = ccp(winSize.width/2,  winSize.height - 430);
+    CCMenuItemLabel *mainmenuItem = [CCMenuItemLabel itemWithLabel:mainmenu target:self selector:@selector(mainmenuTapped:)];
+    mainmenuItem.position = ccp(winSize.width/2,  winSize.height - 460);
+    
+    
+    CCMenu *menu = [CCMenu menuWithItems:playagainItem,spendcoinsItem,achievementsItem,mainmenuItem, nil];
     menu.position = CGPointZero;
-    [self addChild:menu z:999];
+    [gameOverLayer addChild:menu z:999];
     
-    [restartItem runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
-    [label runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
+    //[restartItem runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
+    //[label runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
+    [self addChild:gameOverLayer z:999];
     
     [self unscheduleUpdate];
     
@@ -1162,7 +1324,7 @@
         [self schedule:@selector(updateTimer) interval:.3];
         [self schedule:@selector(updateBg) interval:.1];
         _started = YES;
-        
+        [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsTrainingWheels percentComplete:100.0];
     }else{
         if(!jumping && _man.position.y == jumpOrigin && !fallen){
            /* if(_shipPointsPerSecY > 0){
@@ -1201,7 +1363,7 @@
                 }
             }*/
 
-        }if(fallen && tapCount < 10 && !caught && !dead){
+        }if(fallen && tapCount < 10 && !caught && !dead && ![[CCDirector sharedDirector] isPaused]){
             tapCount++;
             NSMutableArray *getupArray = [NSMutableArray array];
             for(int i = 1; i <= 3; ++i) {
@@ -1230,21 +1392,32 @@
             [self schedule:@selector(updateTimer) interval:.3];
             [self schedule:@selector(updateBg) interval:.1];
             tapCount = 0;
+            [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsChumbawumba percentComplete:100.0];
         }
     }
 }
 
 -(void)swipe{
-    if(!jumping && _man.position.y == jumpOrigin && !fallen){
+    if(!jumping && _man.position.y == jumpOrigin && !fallen && ![[CCDirector sharedDirector] isPaused]){
         _man.scale = 1.1;
         //[[SimpleAudioEngine sharedEngine] playEffect:@"jump.wav"];
         jumping = YES;
         [self schedule:@selector(jumper) interval:.2];
         [trail stopSystem];
         
+        ySpeed = 4;
         [self doJump];
     }
 }
+
+-(void)swipeJump{
+    if(jumping && _man.position.y > jumpOrigin && !fallen && ![[CCDirector sharedDirector] isPaused] && tricker){
+        [_man runAction:[CCRotateBy actionWithDuration:0.55 angle:360]];
+        [dropShadowSprite runAction:[CCRotateBy actionWithDuration:0.55 angle:360]];
+    }
+}
+
+
 
 -(void)doJump{
     if(_shipPointsPerSecY > 0){
@@ -1296,7 +1469,13 @@
 
 -(void)jumper{
     jumping = NO;
+    ySpeed = 2;
     [self unschedule:@selector(jumper)];
+}
+
+-(void)bigJump{
+    bigJump = NO;
+    [self unschedule:@selector(bigJump)];
 }
 
 -(void)updateTimer{
@@ -1308,11 +1487,8 @@
         timer = timer + 7;
     }else if(timer > 400 && timer < 600){
         timer = timer + 4;
-    }else if(timer > 600 && timer < 800){
+    }else if(timer > 600)
         timer = timer + 2;
-    }else{
-        timer = timer + 1;
-    }
 }
 
 -(void)updateBg{

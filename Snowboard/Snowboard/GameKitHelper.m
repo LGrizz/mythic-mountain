@@ -7,7 +7,10 @@
 }
 @end
 
-@implementation GameKitHelper
+@implementation GameKitHelper{
+    
+    NSMutableDictionary *achievementsDictionary;
+}
 
 #pragma mark Singleton stuff
 
@@ -19,6 +22,26 @@
         [[GameKitHelper alloc] init];
     });
     return sharedGameKitHelper;
+}
+
+-(id) init
+{
+    if( (self=[super init] )) {
+        achievementsDictionary = [[NSMutableDictionary alloc] init];
+    }
+    return self;
+}
+
+- (void) loadAchievements
+{
+    [GKAchievement loadAchievementsWithCompletionHandler:^(NSArray *achievements, NSError *error)
+     {
+         if (error == nil)
+         {
+             for (GKAchievement* achievement in achievements)
+                 [achievementsDictionary setObject: achievement forKey: achievement.identifier];
+         }
+     }];
 }
 
 #pragma mark Player Authentication
@@ -39,6 +62,7 @@
         
         if (localPlayer.authenticated) {
             _gameCenterFeaturesEnabled = YES;
+            [self loadAchievements];
         } else if(viewController) {
             [[CCDirector sharedDirector] pause];
             [self presentViewController:viewController];
@@ -107,10 +131,19 @@
 
 - (void) reportAchievementIdentifier: (NSString*) identifier percentComplete: (float) percent
 {
-    GKAchievement *achievementToSend = [[GKAchievement alloc] initWithIdentifier:identifier];
-    achievementToSend.percentComplete = 100;
-    achievementToSend.showsCompletionBanner = YES;
-    [achievementToSend reportAchievementWithCompletionHandler:NULL];
+    if([self getAchievementForIdentifier:identifier] == nil){
+        GKAchievement *achievementToSend = [[GKAchievement alloc] initWithIdentifier:identifier];
+        achievementToSend.percentComplete = 100;
+        achievementToSend.showsCompletionBanner = YES;
+        [achievementToSend reportAchievementWithCompletionHandler:NULL];
+        [achievementsDictionary setObject:achievementToSend forKey:achievementToSend.identifier];
+    }
+}
+
+- (GKAchievement*) getAchievementForIdentifier: (NSString*) identifier
+{
+    GKAchievement *achievement = [achievementsDictionary objectForKey:identifier];
+    return achievement;
 }
 
 - (void) showLeaderboard

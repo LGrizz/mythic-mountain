@@ -63,7 +63,8 @@ typedef enum {
     double _nextArchSpawn;
     
     CCSprite *cliff;
-    
+    CCSprite *bigCliff;
+    float ySpeed;
     
     int _lives;
     
@@ -73,7 +74,9 @@ typedef enum {
     bool _started;
     bool caught;
     bool dead;
-    
+    bool bigJump;
+    bool hitJump;
+    bool tricker;
     
     ARCH_OPTIMAL_PARTICLE_SYSTEM *trail;
     ARCH_OPTIMAL_PARTICLE_SYSTEM *ava;
