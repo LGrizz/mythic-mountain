@@ -14,6 +14,7 @@
 #import "RootViewController.h"
 #import "SimpleAudioEngine.h"
 #import "MainMenuScene.h"
+#import "SettingsManager.h"
 
 @implementation AppDelegate
 
@@ -48,6 +49,11 @@
     // The rest of your application:didFinishLaunchingWithOptions method
     // ...
     
+    [[SettingsManager sharedSettingsManager] load];
+    if([[SettingsManager sharedSettingsManager] getString:@"equipment"] == nil){
+        [[SettingsManager sharedSettingsManager] setStringValue:@"hammer" name:@"equipment"];
+    }
+        
 	// Init the window
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
@@ -128,6 +134,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    [[SettingsManager sharedSettingsManager] load];
 	[[CCDirector sharedDirector] resume];
 }
 
@@ -137,6 +144,7 @@
 
 -(void) applicationDidEnterBackground:(UIApplication*)application {
 	[[CCDirector sharedDirector] stopAnimation];
+    [[SettingsManager sharedSettingsManager] save];
 }
 
 -(void) applicationWillEnterForeground:(UIApplication*)application {
@@ -144,6 +152,8 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [[SettingsManager sharedSettingsManager] save];
+    
 	CCDirector *director = [CCDirector sharedDirector];
 	
 	[[director openGLView] removeFromSuperview];

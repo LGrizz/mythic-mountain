@@ -30,6 +30,8 @@ typedef enum {
     CCSprite *cloud1;
     CCSprite *cloud2;
     CCSprite *cloud3;
+    CCSprite *equipment;
+    CCSprite *equipmentText;
     
     CCParallaxNode *_backgroundNode;
     CCSprite *_background1;
@@ -38,6 +40,7 @@ typedef enum {
     CCSprite *dropShadowSprite;
     CCSprite *dropShadowBoardSprite;
     CCSprite *bg;
+    CCSprite *lighting;
     float _shipPointsPerSecY;
     float _shipPointsPerSecZ;
     float _previousPointsPerSec;
@@ -98,12 +101,11 @@ typedef enum {
     int scoreFlipper;
     int coinScore;
     
-    CCSprite *blackSolid;
-    
     CCLabelTTF * scoreLabel;
     CCLabelTTF * coinScoreLabel;
     
     BOOL hitTime;
+    BOOL icarus;
     
     CCLabelTTF *_label;
     
@@ -111,6 +113,12 @@ typedef enum {
     CCAnimation *rightturn;
     CCAnimation *boardleftturn;
     CCAnimation *boardrightturn;
+    
+    CCGestureRecognizer *singleTap;
+    
+    NSString *equipmentName;
+    NSDictionary *equipmentDic;
+    CCMenuItemSprite *startButton;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
