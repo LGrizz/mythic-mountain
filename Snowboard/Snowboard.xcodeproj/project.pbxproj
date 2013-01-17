@@ -209,6 +209,11 @@
 		27B4AE971523D87600F6D9F2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B4AE961523D87600F6D9F2 /* AppDelegate.m */; };
 		27B4AE9A1523D87600F6D9F2 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B4AE991523D87600F6D9F2 /* RootViewController.m */; };
 		27B4AE9D1523D87600F6D9F2 /* HelloWorldLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 27B4AE9C1523D87600F6D9F2 /* HelloWorldLayer.m */; };
+		27C2A4ED16A8A66400A7703A /* explode.plist in Resources */ = {isa = PBXBuildFile; fileRef = 27C2A4EB16A8A66400A7703A /* explode.plist */; };
+		27C2A4EE16A8A66400A7703A /* explode.png in Resources */ = {isa = PBXBuildFile; fileRef = 27C2A4EC16A8A66400A7703A /* explode.png */; };
+		27C2A4F416A8B88700A7703A /* continue-button.png in Resources */ = {isa = PBXBuildFile; fileRef = 27C2A4F116A8B88700A7703A /* continue-button.png */; };
+		27C2A4F516A8B88700A7703A /* pause_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 27C2A4F216A8B88700A7703A /* pause_bg.png */; };
+		27C2A4F616A8B88700A7703A /* spendCoinsButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 27C2A4F316A8B88700A7703A /* spendCoinsButton.png */; };
 		27C75ABE169C9F7A003CE08D /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27C75ABB169C9F69003CE08D /* GameKit.framework */; };
 		27C75AC2169C9FED003CE08D /* GameKitHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 27C75AC1169C9FED003CE08D /* GameKitHelper.m */; };
 		27D78DE81523DA3600B15A3A /* bg_front_spacedust.png in Resources */ = {isa = PBXBuildFile; fileRef = 27D78DCE1523DA3600B15A3A /* bg_front_spacedust.png */; };
@@ -603,6 +608,11 @@
 		27B4AE9B1523D87600F6D9F2 /* HelloWorldLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HelloWorldLayer.h; sourceTree = "<group>"; };
 		27B4AE9C1523D87600F6D9F2 /* HelloWorldLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelloWorldLayer.m; sourceTree = "<group>"; };
 		27B4AE9E1523D87600F6D9F2 /* GameConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameConfig.h; sourceTree = "<group>"; };
+		27C2A4EB16A8A66400A7703A /* explode.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = explode.plist; sourceTree = "<group>"; };
+		27C2A4EC16A8A66400A7703A /* explode.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = explode.png; sourceTree = "<group>"; };
+		27C2A4F116A8B88700A7703A /* continue-button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "continue-button.png"; sourceTree = "<group>"; };
+		27C2A4F216A8B88700A7703A /* pause_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause_bg.png; sourceTree = "<group>"; };
+		27C2A4F316A8B88700A7703A /* spendCoinsButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spendCoinsButton.png; sourceTree = "<group>"; };
 		27C75ABB169C9F69003CE08D /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		27C75AC0169C9FED003CE08D /* GameKitHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameKitHelper.h; sourceTree = "<group>"; };
 		27C75AC1169C9FED003CE08D /* GameKitHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameKitHelper.m; sourceTree = "<group>"; };
@@ -744,6 +754,7 @@
 		27B0D163168A54C10087C612 /* Xmas images */ = {
 			isa = PBXGroup;
 			children = (
+				27C2A4F016A8B88000A7703A /* Pause */,
 				27E8294016A480D40076720D /* Equipment */,
 				27FE05D716A0D1AE004B959C /* Game Over */,
 				27801133169B7E1800E49B24 /* Enemy */,
@@ -758,6 +769,8 @@
 		27B0D171168A559B0087C612 /* Hill Objects */ = {
 			isa = PBXGroup;
 			children = (
+				27C2A4EB16A8A66400A7703A /* explode.plist */,
+				27C2A4EC16A8A66400A7703A /* explode.png */,
 				27E8296016A5E3D40076720D /* tree_break1.png */,
 				27E8294D16A4B4350076720D /* Big_jump.png */,
 				275A4B89169F563B0011CA0D /* treebreak.plist */,
@@ -1246,6 +1259,16 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		27C2A4F016A8B88000A7703A /* Pause */ = {
+			isa = PBXGroup;
+			children = (
+				27C2A4F116A8B88700A7703A /* continue-button.png */,
+				27C2A4F216A8B88700A7703A /* pause_bg.png */,
+				27C2A4F316A8B88700A7703A /* spendCoinsButton.png */,
+			);
+			name = Pause;
+			sourceTree = "<group>";
+		};
 		27C75ABF169C9FBF003CE08D /* GameKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -1577,6 +1600,11 @@
 				276DBE0A16A71FAA00B41AB3 /* icarus.png in Resources */,
 				276DBE0D16A71FB200B41AB3 /* wings.plist in Resources */,
 				276DBE0E16A71FB200B41AB3 /* wings.png in Resources */,
+				27C2A4ED16A8A66400A7703A /* explode.plist in Resources */,
+				27C2A4EE16A8A66400A7703A /* explode.png in Resources */,
+				27C2A4F416A8B88700A7703A /* continue-button.png in Resources */,
+				27C2A4F516A8B88700A7703A /* pause_bg.png in Resources */,
+				27C2A4F616A8B88700A7703A /* spendCoinsButton.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -57,6 +57,9 @@
         equipmentDic = [NSDictionary dictionaryWithContentsOfFile:path];
         
         CCGestureRecognizer* recognizer;
+        /*recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(pause:)];
+        [startButton addGestureRecognizer:recognizer];*/
+        
         recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UISwipeGestureRecognizer alloc]init] autorelease] target:self action:@selector(swipe)];
         ((UISwipeGestureRecognizer*)recognizer.gestureRecognizer).direction = UISwipeGestureRecognizerDirectionUp;
         [self addGestureRecognizer:recognizer];
@@ -68,9 +71,6 @@
         recognizer = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UISwipeGestureRecognizer alloc]init] autorelease] target:self action:@selector(swipeJump)];
         ((UISwipeGestureRecognizer*)recognizer.gestureRecognizer).direction = UISwipeGestureRecognizerDirectionRight;
         [self addGestureRecognizer:recognizer];
-        
-        singleTap = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(equipTap:)];
-        [self addGestureRecognizer:singleTap];
         
         
         
@@ -102,6 +102,7 @@
         equipActionDone = YES;
         self.isTouchEnabled = YES;
         icarus = NO;
+        oneUse = NO;
         
         //Character Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiturn.plist"];
@@ -180,10 +181,18 @@
         [self addChild:gameovertrapperSheet];
         
         //Background Animations
-        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @"_lighting.plist"]];
-        CCSpriteBatchNode *lightingSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @"_lighting.png"]];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"excalibur", @"_lighting.plist"]];
+        CCSpriteBatchNode *lightingSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"excalibur", @"_lighting.png"]];
         [lightingSheet.texture setAliasTexParameters];
         [self addChild:lightingSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"mjolnir", @"_lighting.plist"]];
+        CCSpriteBatchNode *lightingSheet2 = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"mjolnir", @"_lighting.png"]];
+        [lightingSheet2.texture setAliasTexParameters];
+        [self addChild:lightingSheet2];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"icarus", @"_lighting.plist"]];
+        CCSpriteBatchNode *lightingSheet3 = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"icarus" , @"_lighting.png"]];
+        [lightingSheet3.texture setAliasTexParameters];
+        [self addChild:lightingSheet3];
         
         
         _man = [CCSprite spriteWithFile:@"yetiTurning01.png"];  // 4
@@ -407,9 +416,9 @@
         [self addChild:scoreLabel z:999];
         
         startButton = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"pauseUI.png"] selectedSprite:[CCSprite spriteWithFile:@"pauseUI.png"] target:self selector:@selector(pause:)];
-        CCMenu *starMenu = [CCMenu menuWithItems:startButton, nil];
-        starMenu.position = ccp(50, 30);
-        [self addChild:starMenu z:999];
+        //pauseMenu = [CCMenu menuWithItems:startButton, nil];
+        startButton.position = ccp(50, 30);
+        [self addChild:startButton z:999];
         
         CCSprite *coinUI = [CCSprite spriteWithFile:@"coinUI.png"];
         coinUI.position = ccp(winSize.width - 20, winSize.height - 30);
@@ -422,6 +431,9 @@
         [self addChild:coinScoreLabel z:999];
         
         _previousPointsPerSec = 0;
+        
+        singleTap = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(equipTap:)];
+        [self addGestureRecognizer:singleTap];
     }
     return self;
 }
@@ -429,9 +441,64 @@
 - (void) pause: (id) sender
 {
     if([[CCDirector sharedDirector] isPaused]){
+        [self removeChild:pauseLayer cleanup:YES];
+        singleTap = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(equipTap:)];
+        [self addGestureRecognizer:singleTap];
         [[CCDirector sharedDirector] resume];
     }else{
         [[CCDirector sharedDirector] pause];
+        [self removeGestureRecognizer:singleTap];
+        
+        CGSize winSize = [CCDirector sharedDirector].winSize;
+        
+        pauseLayer = [CCLayer node];
+        
+        CCSprite *gameoverBg = [CCSprite spriteWithFile:@"pause_bg.png"];
+        gameoverBg.anchorPoint = ccp(0.0f,1.0f);
+        gameoverBg.position = ccp(0, winSize.height);
+        gameoverBg.opacity = 130;
+        [pauseLayer addChild:gameoverBg z:990];
+        
+        CCSprite *pauseHeader = [CCSprite spriteWithFile:@"pauseUI.png"];
+        pauseHeader.scale = 2;
+        pauseHeader.position = ccp(winSize.width/2 + pauseHeader.boundingBox.size.width/4 - 5 , winSize.height - 60);
+        [pauseLayer addChild:pauseHeader z:999];
+        
+        CCSprite *characterButton = [CCSprite spriteWithFile:@"yetiTurning01.png"];
+        characterButton.position = ccp(winSize.width-80 , winSize.height - 230);
+        characterButton.scale = 2;
+        [pauseLayer addChild:characterButton z:999];
+        
+        CCMenuItemSprite *spendCoins = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"spendCoinsButton.png"] selectedSprite:[CCSprite spriteWithFile:@"spendCoinsButton.png"] target:self selector:@selector(pause:)];
+        
+        CCMenuItemSprite *continueButton = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"continue-button.png"] selectedSprite:[CCSprite spriteWithFile:@"continue-button.png"] target:self selector:@selector(pause:)];
+        
+        CCMenu *menu = [CCMenu menuWithItems:spendCoins,continueButton, nil];
+        menu.position = ccp(winSize.width/2, winSize.height - 230);
+        [menu alignItemsHorizontallyWithPadding:20];
+        [pauseLayer addChild:menu z:998];
+        
+        singleTap = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(pause:)];
+        [continueButton addGestureRecognizer:singleTap];
+        
+        CCLabelBMFont *settings;
+        settings = [CCLabelBMFont labelWithString:@"SETTINGS" fntFile:@"game_over_menu28pt.fnt"];
+        CCLabelBMFont *achievements;
+        achievements = [CCLabelBMFont labelWithString:@"ACHIEVEMENTS" fntFile:@"game_over_menu28pt.fnt"];
+        CCLabelBMFont *mainmenu;
+        mainmenu = [CCLabelBMFont labelWithString:@"MAIN MENU" fntFile:@"game_over_menu28pt.fnt"];
+        
+        CCMenuItemLabel *settingsItem = [CCMenuItemLabel itemWithLabel:settings target:self selector:@selector(restartTapped:)];
+        settingsItem.position = ccp(winSize.width/2, winSize.height - 370);
+        CCMenuItemLabel *achievementsItem = [CCMenuItemLabel itemWithLabel:achievements target:self selector:@selector(achievementsTapped:)];
+        achievementsItem.position = ccp(winSize.width/2,  winSize.height - 410);
+        CCMenuItemLabel *mainmenuItem = [CCMenuItemLabel itemWithLabel:mainmenu target:self selector:@selector(mainmenuTapped:)];
+        mainmenuItem.position = ccp(winSize.width/2,  winSize.height - 450);
+        
+        menu = [CCMenu menuWithItems:settingsItem,achievementsItem,mainmenuItem, nil];
+        menu.position = CGPointZero;
+        [pauseLayer addChild:menu z:999];
+        [self addChild:pauseLayer z:999];
     }
 }
 
@@ -513,6 +580,10 @@
         icarus = NO;
         equipment.opacity = 50;
         [equipment runAction:[CCScaleTo actionWithDuration:0.5 scale:0.3]];
+        if(oneUse){
+            equipment.visible = NO;
+            oneUse = NO;
+        }
     }else if(bigJump && _man.position.y > jumpOrigin + 110){
         jumping = NO;
         bigJump = NO;
@@ -565,7 +636,6 @@
             equipment.scale = 1;
             equipment.opacity = 255;
         }
-        NSLog(@"%d", equipment.opacity);
 
 
         if(_shipPointsPerSecY < 0 && _previousPointsPerSec >= 0 && _man.position.y == jumpOrigin){
@@ -805,6 +875,27 @@
         [self addChild:bigCliff z:898];
         //bigCliff.scale = 3.5f;
         bigCliff.visible = YES;
+        
+        float hillEquipRan = [self randomValueBetween:1.0 andValue:4.0];
+        NSLog(@"%f", hillEquipRan);
+        switch ((int)hillEquipRan)
+        {
+            case 1:
+                hillEquipment = [CCSprite spriteWithFile:@"mjolnir.png"];
+                hillEquipment.userData = @"mjolnir";
+                break;
+            case 2:
+                hillEquipment = [CCSprite spriteWithFile:@"excalibur.png"];
+                hillEquipment.userData = @"excalibur";
+                break;
+            case 3:
+                hillEquipment = [CCSprite spriteWithFile:@"icarus.png"];
+                hillEquipment.userData = @"icarus";
+                break;
+        }
+        [hillEquipment.texture setAliasTexParameters];
+        hillEquipment.position = ccp(winSize.width/2, -350);
+        [self addChild:hillEquipment z:899];
     }
     
     CGRect bigCliffRect = CGRectMake(bigCliff.boundingBox.origin.x, bigCliff.boundingBox.origin.y+80, bigCliff.boundingBox.size.width, 1);
@@ -813,6 +904,7 @@
     CGRect manrect = CGRectMake(_man.boundingBox.origin.x, _man.boundingBox.origin.y, _man.boundingBox.size.width, _man.boundingBox.size.height);
     CGRect boardrect = CGRectMake(_board.boundingBox.origin.x, _board.boundingBox.origin.y, _board.boundingBox.size.width, _board.boundingBox.size.height);
     CGRect equipRect = CGRectMake(equipment.boundingBox.origin.x, equipment.boundingBox.origin.y, equipment.boundingBox.size.width, equipment.boundingBox.size.height);
+    CGRect hillEqupRect = CGRectMake(hillEquipment.boundingBox.origin.x, hillEquipment.boundingBox.origin.y, hillEquipment.boundingBox.size.width, hillEquipment.boundingBox.size.height);
     
     if (CGRectIntersectsRect(shiprect, cliffRect) && _man.position.y == jumpOrigin && cliff.zOrder > 490) {
         if(!jumping && _man.position.y == jumpOrigin){
@@ -822,7 +914,13 @@
             [trail stopSystem];
             [self doJump];
             ySpeed = 4;
-            timer = timer + 50;
+            timer = timer + 25;
+        }
+    }
+        
+    if (CGRectIntersectsRect(shiprect, hillEqupRect) && _man.position.y == jumpOrigin && hillEquipment.zOrder > 490) {
+        if(!jumping && _man.position.y == jumpOrigin){
+            [self switchEquipment];
         }
     }
         
@@ -853,6 +951,15 @@
     }else{
         bigCliff.position = ccpAdd(bigCliff.position, ccpMult(asteroidScrollVel, dt));
     }
+        
+        if(hillEquipment.position.y > winSize.height - 155 && hillEquipment.zOrder > 490){
+            [self reorderChild:hillEquipment z:490];
+            hillEquipment.position = ccpSub(hillEquipment.position, ccpMult(asteroidScrollVelDown, dt));
+        }else if(hillEquipment.zOrder == 490){
+            hillEquipment.position = ccpSub(hillEquipment.position, ccpMult(asteroidScrollVelDown, dt));
+        }else{
+            hillEquipment.position = ccpAdd(hillEquipment.position, ccpMult(asteroidScrollVel, dt));
+        }
     
     for (CCSprite *coin in _coins) {
         if (!coin.visible) continue;
@@ -1320,6 +1427,9 @@
 }
 
 - (void)restartTapped:(id)sender {
+    if([[CCDirector sharedDirector] isPaused]){
+        [[CCDirector sharedDirector] resume];
+    }
     [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
 }
 
@@ -1328,6 +1438,9 @@
 }
 
 - (void)mainmenuTapped:(id)sender {
+    if([[CCDirector sharedDirector] isPaused]){
+        [[CCDirector sharedDirector] resume];
+    }
     [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[MainMenuScene scene]]];
 }
 
@@ -1443,6 +1556,16 @@
 }
 
 -(void)equipTap:(UIGestureRecognizer *)gestureRecognizer{
+   
+    CGPoint tapPoint = [gestureRecognizer locationInView:gestureRecognizer.view];
+    tapPoint = [[CCDirector sharedDirector] convertToGL:tapPoint];
+    CGRect tapper = CGRectMake(tapPoint.x, tapPoint.y, 1, 1);
+    CGRect pauseRect = startButton.boundingBox;
+    if(CGRectIntersectsRect(tapper, pauseRect)){
+        NSLog(@"%@", @"paaasue");
+        [self performSelector:@selector(pause:)];
+    }else{
+    
     if(_started == NO){
         [self addChild:trail z:898];
         [trail resetSystem];
@@ -1453,7 +1576,7 @@
         [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsTrainingWheels percentComplete:100.0];
     }else{
     
-    if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1){
+    if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1 && equipment.visible){
         if([equipmentName isEqualToString:@"mjolnir"]){
             [equipment runAction:[CCRepeat actionWithAction:[CCRotateBy actionWithDuration:.4 angle:360] times:3]];
             CGPoint point = [gestureRecognizer locationInView:gestureRecognizer.view];
@@ -1461,20 +1584,36 @@
             equipAction = TRUE;
             equipActionDone = NO;
             id move = [CCMoveTo actionWithDuration:1 position:point];
-            id cleaner = [CCCallBlock actionWithBlock:^{
+            id cleaner;
+            if(!oneUse){
+                cleaner = [CCCallBlock actionWithBlock:^{
                 equipActionDone = YES;
                 [equipment runAction:[CCScaleTo actionWithDuration:0.5 scale:0.3]];
             }];
+            }else{
+                cleaner = [CCCallBlock actionWithBlock:^{
+                    equipActionDone = YES;
+                    equipment.visible = NO;
+                }];
+            }
             CCSequence *action = [CCSequence actions:move, cleaner, nil];
             [equipment runAction:action];
         }else if([equipmentName isEqualToString:@"excalibur"]){
             equipActionDone = NO;
             id orbitAction = [CCRotateBy actionWithDuration:1 angle:360];
-            id cleaner = [CCCallBlock actionWithBlock:^{
+            id cleaner;
+            if(!oneUse){
+             cleaner = [CCCallBlock actionWithBlock:^{
                 equipActionDone = YES;
                 equipment.opacity = 50;
                 [equipment runAction:[CCScaleTo actionWithDuration:0.5 scale:0.3]];
             }];
+            }else{
+                cleaner = [CCCallBlock actionWithBlock:^{
+                    equipActionDone = YES;
+                    equipment.visible = NO;
+                }];
+            }
             CCSequence *action = [CCSequence actions:orbitAction, cleaner, nil];
             [equipment runAction:action];
         }else if([equipmentName isEqualToString:@"icarus"]){
@@ -1512,6 +1651,7 @@
         CCSequence *lightAction = [CCSequence actions:lightShow, lightClean, nil];
         [lighting runAction:lightAction];
         }
+    }
     }
 }
 
@@ -1674,12 +1814,12 @@
     if(timer <= 0){
         timer = timer + 70;
     }else if(timer > 0 && timer <= 200){
-        timer = timer + 7;
+        timer = timer + 6;
     }else if(timer > 200 && timer <= 500){
-        timer = timer + 5;
-    }else if(timer > 500 && timer <= 700){
-        timer = timer + 3;
-    }else if(timer > 700){
+        timer = timer + 4;
+    }else if(timer > 500 && timer <= 800){
+        timer = timer + 2;
+    }else if(timer > 800){
         timer = timer + 1;
     }
     
@@ -1703,6 +1843,50 @@
 -(void)hitTime{
     hitTime = NO;
     [self unschedule:@selector(hitTime)];
+}
+
+-(void)switchEquipment{
+    [self removeChild:equipment cleanup:YES];
+    NSString *path=[[NSBundle mainBundle] pathForResource:@"equipment" ofType:@"plist"];
+    equipmentDic = [NSDictionary dictionaryWithContentsOfFile:path];
+    
+    if([((NSString *)hillEquipment.userData) isEqualToString:@"mjolnir"]){
+        equipmentName = @"mjolnir";
+    }else if([((NSString *)hillEquipment.userData) isEqualToString:@"excalibur"]){
+        equipmentName = @"excalibur";
+    }else if([((NSString *)hillEquipment.userData) isEqualToString:@"icarus"]){
+        equipmentName = @"icarus";
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"wings.plist"];
+        CCSpriteBatchNode *wingSheet = [CCSpriteBatchNode batchNodeWithFile:@"wings.png"];
+        [wingSheet.texture setAliasTexParameters];
+        [self addChild:wingSheet];
+    }
+    
+    equipment = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @".png"]];
+    [equipment.texture setAliasTexParameters];
+    equipment.position = ccp(_man.position.x + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"x"] intValue], _man.position.y + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"y"] intValue]);
+    equipment.anchorPoint = ccp(([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorX"] floatValue]), ([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorY"] floatValue]));
+    [self addChild:equipment z:899];
+    
+    oneUse = YES;
+    
+    NSMutableArray *lightingArray = [NSMutableArray array];
+    for(int i = 1; i <= [((NSString *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"frames"]) intValue]; ++i) {
+        [lightingArray addObject:
+         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+          [NSString stringWithFormat:[NSString stringWithFormat:@"%@%@", equipmentName, @"_bg_animation%d.png"], i]]];
+    }
+    CCAnimation *light = [CCAnimation animationWithFrames:lightingArray delay:0.1f];
+    id lightClean = [CCCallBlock actionWithBlock:^{
+        [equipmentText runAction:[CCScaleTo actionWithDuration:0.3 scale:0]];
+        [self reorderChild:lighting z:479];
+    }];
+    id lightShow = [CCAnimate actionWithAnimation:light restoreOriginalFrame:NO];
+    [equipmentText runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
+    [self reorderChild:lighting z:481];
+    CCSequence *lightAction = [CCSequence actions:lightShow, lightClean, nil];
+    [lighting runAction:lightAction];
+    
 }
 
 // on "dealloc" you need to release all your retained objects

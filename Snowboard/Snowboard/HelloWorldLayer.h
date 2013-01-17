@@ -32,6 +32,7 @@ typedef enum {
     CCSprite *cloud3;
     CCSprite *equipment;
     CCSprite *equipmentText;
+    CCSprite *hillEquipment;
     
     CCParallaxNode *_backgroundNode;
     CCSprite *_background1;
@@ -80,6 +81,7 @@ typedef enum {
     bool bigJump;
     bool hitJump;
     bool tricker;
+    bool oneUse;
     
     ARCH_OPTIMAL_PARTICLE_SYSTEM *trail;
     ARCH_OPTIMAL_PARTICLE_SYSTEM *ava;
@@ -119,6 +121,9 @@ typedef enum {
     NSString *equipmentName;
     NSDictionary *equipmentDic;
     CCMenuItemSprite *startButton;
+    
+    CCMenu *pauseMenu;
+    CCLayer *pauseLayer;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
