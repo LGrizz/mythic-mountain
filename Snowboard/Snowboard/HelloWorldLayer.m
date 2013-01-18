@@ -14,6 +14,8 @@
 #import "CCGestureRecognizer.h"
 #import "MainMenuScene.h"
 #import "SettingsManager.h"
+#import "StoreScene.h"
+#import "PauseLayer.h"
 
 #define kNumTrees 30
 #define kNumRocks 5
@@ -161,6 +163,10 @@
         CCSpriteBatchNode *treebreakSheet = [CCSpriteBatchNode batchNodeWithFile:@"treebreak.png"];
         [treebreakSheet.texture setAliasTexParameters];
         [self addChild:treebreakSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"explode.plist"];
+        CCSpriteBatchNode *explodeSheet = [CCSpriteBatchNode batchNodeWithFile:@"explode.png"];
+        [explodeSheet.texture setAliasTexParameters];
+        [self addChild:explodeSheet];
 
         //Enemy Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"heli.plist"];
@@ -448,56 +454,7 @@
     }else{
         [[CCDirector sharedDirector] pause];
         [self removeGestureRecognizer:singleTap];
-        
-        CGSize winSize = [CCDirector sharedDirector].winSize;
-        
-        pauseLayer = [CCLayer node];
-        
-        CCSprite *gameoverBg = [CCSprite spriteWithFile:@"pause_bg.png"];
-        gameoverBg.anchorPoint = ccp(0.0f,1.0f);
-        gameoverBg.position = ccp(0, winSize.height);
-        gameoverBg.opacity = 130;
-        [pauseLayer addChild:gameoverBg z:990];
-        
-        CCSprite *pauseHeader = [CCSprite spriteWithFile:@"pauseUI.png"];
-        pauseHeader.scale = 2;
-        pauseHeader.position = ccp(winSize.width/2 + pauseHeader.boundingBox.size.width/4 - 5 , winSize.height - 60);
-        [pauseLayer addChild:pauseHeader z:999];
-        
-        CCSprite *characterButton = [CCSprite spriteWithFile:@"yetiTurning01.png"];
-        characterButton.position = ccp(winSize.width-80 , winSize.height - 230);
-        characterButton.scale = 2;
-        [pauseLayer addChild:characterButton z:999];
-        
-        CCMenuItemSprite *spendCoins = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"spendCoinsButton.png"] selectedSprite:[CCSprite spriteWithFile:@"spendCoinsButton.png"] target:self selector:@selector(pause:)];
-        
-        CCMenuItemSprite *continueButton = [CCMenuItemSprite itemFromNormalSprite:[CCSprite spriteWithFile:@"continue-button.png"] selectedSprite:[CCSprite spriteWithFile:@"continue-button.png"] target:self selector:@selector(pause:)];
-        
-        CCMenu *menu = [CCMenu menuWithItems:spendCoins,continueButton, nil];
-        menu.position = ccp(winSize.width/2, winSize.height - 230);
-        [menu alignItemsHorizontallyWithPadding:20];
-        [pauseLayer addChild:menu z:998];
-        
-        singleTap = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(pause:)];
-        [continueButton addGestureRecognizer:singleTap];
-        
-        CCLabelBMFont *settings;
-        settings = [CCLabelBMFont labelWithString:@"SETTINGS" fntFile:@"game_over_menu28pt.fnt"];
-        CCLabelBMFont *achievements;
-        achievements = [CCLabelBMFont labelWithString:@"ACHIEVEMENTS" fntFile:@"game_over_menu28pt.fnt"];
-        CCLabelBMFont *mainmenu;
-        mainmenu = [CCLabelBMFont labelWithString:@"MAIN MENU" fntFile:@"game_over_menu28pt.fnt"];
-        
-        CCMenuItemLabel *settingsItem = [CCMenuItemLabel itemWithLabel:settings target:self selector:@selector(restartTapped:)];
-        settingsItem.position = ccp(winSize.width/2, winSize.height - 370);
-        CCMenuItemLabel *achievementsItem = [CCMenuItemLabel itemWithLabel:achievements target:self selector:@selector(achievementsTapped:)];
-        achievementsItem.position = ccp(winSize.width/2,  winSize.height - 410);
-        CCMenuItemLabel *mainmenuItem = [CCMenuItemLabel itemWithLabel:mainmenu target:self selector:@selector(mainmenuTapped:)];
-        mainmenuItem.position = ccp(winSize.width/2,  winSize.height - 450);
-        
-        menu = [CCMenu menuWithItems:settingsItem,achievementsItem,mainmenuItem, nil];
-        menu.position = CGPointZero;
-        [pauseLayer addChild:menu z:999];
+        pauseLayer = [[PauseLayer alloc] init];
         [self addChild:pauseLayer z:999];
     }
 }
@@ -623,65 +580,21 @@
         equipment.position = ccp((_man.position.x + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"x"] intValue]), (_man.position.y + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"y"] intValue] + 1));
     }
         
-        if(equipment.scale < 1) {
-            equipment.scale += 0.001;
-            if(scoreFlipper == 4){
-                if(equipment.opacity < 50){
-                    equipment.opacity = 50;
-                }else{
-                    equipment.opacity += 1;
-                }
+    if(equipment.scale < 1) {
+        equipment.scale += 0.001;
+        if(scoreFlipper == 4){
+            if(equipment.opacity < 50){
+                equipment.opacity = 50;
+            }else{
+                equipment.opacity += 1;
             }
-        }else{
-            equipment.scale = 1;
-            equipment.opacity = 255;
         }
+    }else{
+        equipment.scale = 1;
+        equipment.opacity = 255;
+    }
 
-
-        if(_shipPointsPerSecY < 0 && _previousPointsPerSec >= 0 && _man.position.y == jumpOrigin){
-            NSMutableArray *leftturnArray = [NSMutableArray array];
-            for(int i = 1; i <= 9; ++i) {
-                [leftturnArray addObject:
-                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                  [NSString stringWithFormat:@"yetiTurning0%d.png", i]]];
-            }
-            
-            leftturn = [CCAnimation animationWithFrames:leftturnArray delay:0.05f];
-            [_man runAction:[CCAnimate actionWithAnimation:leftturn restoreOriginalFrame:NO]];
-            
-            NSMutableArray *leftboardturnArray = [NSMutableArray array];
-            for(int i = 1; i <= 9; ++i) {
-                [leftboardturnArray addObject:
-                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                  [NSString stringWithFormat:@"board_turning0%d.png", i]]];
-            }
-            
-            boardleftturn = [CCAnimation animationWithFrames:leftboardturnArray delay:0.05f];
-            [_board runAction:[CCAnimate actionWithAnimation:boardleftturn restoreOriginalFrame:NO]];
-            _previousPointsPerSec = _shipPointsPerSecY;
-        }else if (_shipPointsPerSecY > 0 && _previousPointsPerSec <= 0 && _man.position.y == jumpOrigin){
-            NSMutableArray *rightturnArray = [NSMutableArray array];
-            for(int i = 9; i >= 1; --i) {
-                [rightturnArray addObject:
-                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                  [NSString stringWithFormat:@"yetiTurning0%d.png", i]]];
-            }
-            rightturn = [CCAnimation animationWithFrames:rightturnArray delay:0.05f];
-            [_man runAction:[CCAnimate actionWithAnimation:rightturn restoreOriginalFrame:NO]];
-            
-            NSMutableArray *rightboardturnArray = [NSMutableArray array];
-            for(int i = 9; i >= 1; --i) {
-                [rightboardturnArray addObject:
-                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                  [NSString stringWithFormat:@"board_turning0%d.png", i]]];
-            }
-            
-            boardrightturn = [CCAnimation animationWithFrames:rightboardturnArray delay:0.05f];
-            [_board runAction:[CCAnimate actionWithAnimation:boardrightturn restoreOriginalFrame:NO]];
-            _previousPointsPerSec = _shipPointsPerSecY;
-        }
-    
-    
+    [self turnBoard];
     
     [dropShadowSprite setDisplayFrame:[_man displayedFrame]];
     dropShadowSprite.position = ccp(newX, jumpOrigin);
@@ -762,7 +675,7 @@
     
     if (curTime > _nextRockSpawn && score > 500 && !bigJump) {
         
-        float randSecs = [self randomValueBetween:1000/_backgroundSpeed andValue:2500/_backgroundSpeed];
+        float randSecs = [self randomValueBetween:2200/_backgroundSpeed andValue:3500/_backgroundSpeed];
         _nextRockSpawn = randSecs + curTime;
         
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
@@ -907,6 +820,7 @@
     CGRect hillEqupRect = CGRectMake(hillEquipment.boundingBox.origin.x, hillEquipment.boundingBox.origin.y, hillEquipment.boundingBox.size.width, hillEquipment.boundingBox.size.height);
     
     if (CGRectIntersectsRect(shiprect, cliffRect) && _man.position.y == jumpOrigin && cliff.zOrder > 490) {
+        [[SimpleAudioEngine sharedEngine] playEffect:@"hitjump.wav"];
         if(!jumping && _man.position.y == jumpOrigin){
             //[[SimpleAudioEngine sharedEngine] playEffect:@"bigJump.wav"];
             jumping = YES;
@@ -925,6 +839,7 @@
     }
         
     if (CGRectIntersectsRect(shiprect, bigCliffRect) && _man.position.y == jumpOrigin && bigCliff.zOrder > 490) {
+        [[SimpleAudioEngine sharedEngine] playEffect:@"hitjump.wav"];
         if(!jumping && _man.position.y == jumpOrigin){
             jumping = YES;
             [trail stopSystem];
@@ -975,6 +890,7 @@
         CGRect asteroidRect = CGRectMake(coin.boundingBox.origin.x, coin.boundingBox.origin.y, coin.boundingBox.size.width, coin.boundingBox.size.height);
         
         if (CGRectIntersectsRect(manrect, asteroidRect) && !hitTime && coin.zOrder > 700 && _man.position.y < jumpOrigin + 30) {
+            [[SimpleAudioEngine sharedEngine] playEffect:@"coin.wav"];
             NSMutableArray *coinArray = [NSMutableArray array];
             for(int i = 1; i <= 5; ++i) {
                 [coinArray addObject:
@@ -1018,7 +934,7 @@
         CGRect asteroidRect = CGRectMake(tree.boundingBox.origin.x + tree.boundingBox.size.width - 20, tree.boundingBox.origin.y, 5, 20);
         
         if (CGRectIntersectsRect(shiprect, asteroidRect) && !hitTime && tree.zOrder > 700 && tree.texture == [[CCSprite spriteWithFile:@"tree_break1.png"]texture]) {
-            //[self unscheduleUpdate];
+            [[SimpleAudioEngine sharedEngine] playEffect:@"hit.wav"];
             [self schedule:@selector(hitTime) interval:1];
             hitTime = YES;
             [_board stopAllActions];
@@ -1045,6 +961,7 @@
             fall.position=ccp(_man.position.x, _man.position.y-20);
             [self addChild:fall z:899];
             [self reorderChild:tree z:700];
+            [[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
         }
         
         if (CGRectIntersectsRect(cliffRect, asteroidRect) && tree.zOrder > 490 && cliff.zOrder > 490) {
@@ -1069,10 +986,10 @@
     
     for (CCSprite *rock in _rocks) {
         if (!rock.visible) continue;
-        CGRect rockRect = CGRectMake(rock.boundingBox.origin.x+rock.boundingBox.size.width/2, rock.boundingBox.origin.y+rock.boundingBox.size.height/2, 1, 1);
+        CGRect rockRect = CGRectMake(rock.position.x, rock.position.y, 1, 1);
         
-        if (CGRectIntersectsRect(boardrect, rockRect) && _man.position.y == jumpOrigin && rock.zOrder>490) {
-            //[[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
+        if (CGRectIntersectsRect(boardrect, rockRect) && _man.position.y == jumpOrigin && rock.zOrder>490 && rock.texture == [[CCSprite spriteWithFile:@"rock.png"] texture]) {
+            [[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
             [_board stopAllActions];
             [_man stopAllActions];
             NSMutableArray *fallingArray = [NSMutableArray array];
@@ -1125,6 +1042,25 @@
             rock.visible = NO;
         }
         
+        if (CGRectIntersectsRect(equipRect, rockRectCliff) && !hitTime && rock.zOrder > 700 && !equipActionDone) {
+            [[SimpleAudioEngine sharedEngine] playEffect:@"explode.wav"];
+            NSMutableArray *explodeArray = [NSMutableArray array];
+            for(int i = 1; i <= 6; ++i) {
+                [explodeArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"explode%d.png", i]]];
+            }
+            CCAnimation *rockExplode = [CCAnimation animationWithFrames:explodeArray delay:0.1f];
+            [self reorderChild:rock z:700];
+            id rockClean = [CCCallBlock actionWithBlock:^{
+                rock.visible = NO;
+            }];
+            id exploder = [CCAnimate actionWithAnimation:rockExplode restoreOriginalFrame:YES];
+            CCSequence *lightAction = [CCSequence actions:exploder, rockClean, nil];
+            [rock runAction:lightAction];
+            
+        }
+        
         if(rock.position.y > winSize.height-155 && rock.zOrder > 490){
             [self reorderChild:rock z:490];
             rock.position = ccpSub(rock.position, ccpMult(asteroidScrollVelDown, dt));
@@ -1137,10 +1073,10 @@
     
     for (CCSprite *spike in _spikes) {
         if (!spike.visible) continue;
-        CGRect spikeRect = CGRectMake(spike.boundingBox.origin.x+spike.boundingBox.size.width/2, spike.boundingBox.origin.y+spike.boundingBox.size.height/2, 1, 1);
+        CGRect spikeRect = CGRectMake(spike.position.x, spike.position.y, 1, 1);
     
-        if (CGRectIntersectsRect(boardrect, spikeRect) && _man.position.y == jumpOrigin && spike.zOrder > 490) {
-            //[[SimpleAudioEngine sharedEngine] playEffect:@"fall.wav"];
+        if (CGRectIntersectsRect(boardrect, spikeRect) && _man.position.y == jumpOrigin && spike.zOrder > 490 && spike.texture == [[CCSprite spriteWithFile:@"spikes.png"] texture]) {
+            [[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
             [_board stopAllActions];
             [_man stopAllActions];
             [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
@@ -1180,6 +1116,25 @@
         CGRect spikeRectCliff = CGRectMake(spike.boundingBox.origin.x, spike.boundingBox.origin.y, spike.boundingBox.size.width, spike.boundingBox.size.height);
         if (CGRectIntersectsRect(cliffRecter, spikeRectCliff) && spike.zOrder > 490 && cliff.zOrder > 490) {
             spike.visible = NO;
+        }
+        
+        if (CGRectIntersectsRect(equipRect, spikeRectCliff) && !hitTime && spike.zOrder > 700 && !equipActionDone) {
+            [[SimpleAudioEngine sharedEngine] playEffect:@"explode.wav"];
+            NSMutableArray *explodeArray = [NSMutableArray array];
+            for(int i = 1; i <= 6; ++i) {
+                [explodeArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"explode%d.png", i]]];
+            }
+            CCAnimation *rockExplode = [CCAnimation animationWithFrames:explodeArray delay:0.1f];
+            [self reorderChild:spike z:700];
+            id rockClean = [CCCallBlock actionWithBlock:^{
+                spike.visible = NO;
+            }];
+            id exploder = [CCAnimate actionWithAnimation:rockExplode restoreOriginalFrame:YES];
+            CCSequence *lightAction = [CCSequence actions:exploder, rockClean, nil];
+            [spike runAction:lightAction];
+            
         }
     
         if(spike.position.y > winSize.height-155 && spike.zOrder > 490){
@@ -1426,117 +1381,14 @@
     _shipPointsPerSecZ = pointsPerSec2;
 }
 
-- (void)restartTapped:(id)sender {
-    if([[CCDirector sharedDirector] isPaused]){
-        [[CCDirector sharedDirector] resume];
-    }
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
-}
-
-- (void)achievementsTapped:(id)sender {
-    [[GameKitHelper sharedGameKitHelper] showAchievements];
-}
-
-- (void)mainmenuTapped:(id)sender {
-    if([[CCDirector sharedDirector] isPaused]){
-        [[CCDirector sharedDirector] resume];
-    }
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[MainMenuScene scene]]];
-}
-
 - (void)endScene:(EndReason)endReason {
     [self removeGestureRecognizer:singleTap];
     
     if (_gameOver) return;
     _gameOver = true;
     
-    CGSize winSize = [CCDirector sharedDirector].winSize;
+    gameOverLayer = [[GameOverLayer alloc] init:(int)score coins:(int)coinScore];
     
-    CCLayer *gameOverLayer = [CCLayer node];
-    
-    CCSprite *gameoverBg = [CCSprite spriteWithFile:@"gameoverBg.png"];
-    gameoverBg.anchorPoint = ccp(0.0f,1.0f);
-    gameoverBg.position = ccp(0, winSize.height);
-    gameoverBg.opacity = 130;
-    [gameOverLayer addChild:gameoverBg z:990];
-    
-    CCSprite *gameoverTrapper = [CCSprite spriteWithFile:@"gameovertrapper1.png"];
-    gameoverTrapper.position = ccp(115, winSize.height-155);
-    [gameoverTrapper.texture setAliasTexParameters];
-    [gameOverLayer addChild:gameoverTrapper z:995];
-    
-    NSMutableArray *gameovertrapperArray = [NSMutableArray array];
-    for(int i = 1; i <= 4; ++i) {
-        [gameovertrapperArray addObject:
-         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-          [NSString stringWithFormat:@"trapper%d.png", i]]];
-    }
-    
-    CCAnimation *gameovertrapperpump = [CCAnimation animationWithFrames:gameovertrapperArray delay:0.1f];
-    [gameoverTrapper runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:gameovertrapperpump restoreOriginalFrame:NO]]];
-    
-    CCSprite *gameoverCage = [CCSprite spriteWithFile:@"yeti_cage1.png"];
-    gameoverCage.position = ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2);
-    [gameoverCage.texture setAliasTexParameters];
-    [gameOverLayer addChild:gameoverCage z:996];
-    
-    NSMutableArray *gameoverCageArray = [NSMutableArray array];
-    for(int i = 1; i <= 2; ++i) {
-        [gameoverCageArray addObject:
-         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-          [NSString stringWithFormat:@"yeti_cage%d.png", i]]];
-    }
-    
-    CCAnimation *cageShake = [CCAnimation animationWithFrames:gameoverCageArray delay:0.1f];
-    [gameoverCage runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:cageShake restoreOriginalFrame:NO]]];
-    
-    CCLabelBMFont *label;
-    label = [CCLabelBMFont labelWithString:@"GAME OVER" fntFile:@"game_over40pt.fnt"];
-    label.position = ccp(winSize.width/2, winSize.height - 250);
-    [gameOverLayer addChild:label z:999];
-    
-    CCLabelBMFont *yards;
-    yards = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"You made it %d yards", (int)score] fntFile:@"game_over_dist_coins16pt.fnt"];
-    yards.position = ccp(winSize.width/2, winSize.height - 282);
-    [gameOverLayer addChild:yards z:997];
-    CCLabelBMFont *coins;
-    coins = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"You collected %d coins", (int)coinScore] fntFile:@"game_over_dist_coins16pt.fnt"];
-    coins.position = ccp(winSize.width/2, winSize.height - 302);
-    [gameOverLayer addChild:coins z:997];
-    
-    CCSprite *fb = [CCSprite spriteWithFile:@"facebook.png"];
-    fb.position = ccp(winSize.width/2 + 15, winSize.height - 330);
-    [gameOverLayer addChild:fb z:997];
-    
-    CCSprite *twitter = [CCSprite spriteWithFile:@"twitter.png"];
-    twitter.position = ccp(winSize.width/2 - 15, winSize.height - 330);
-    [gameOverLayer addChild:twitter z:997];
-    
-    CCLabelBMFont *playagain;
-    playagain = [CCLabelBMFont labelWithString:@"PLAY AGAIN" fntFile:@"game_over_menu28pt.fnt"];
-    CCLabelBMFont *spendcoins;
-    spendcoins = [CCLabelBMFont labelWithString:@"SPEND COINS" fntFile:@"game_over_menu28pt.fnt"];
-    CCLabelBMFont *achievements;
-    achievements = [CCLabelBMFont labelWithString:@"ACHIEVEMENTS" fntFile:@"game_over_menu28pt.fnt"];
-    CCLabelBMFont *mainmenu;
-    mainmenu = [CCLabelBMFont labelWithString:@"MAIN MENU" fntFile:@"game_over_menu28pt.fnt"];
-    
-    CCMenuItemLabel *playagainItem = [CCMenuItemLabel itemWithLabel:playagain target:self selector:@selector(restartTapped:)];
-    playagainItem.position = ccp(winSize.width/2, winSize.height - 370);
-    CCMenuItemLabel *spendcoinsItem = [CCMenuItemLabel itemWithLabel:spendcoins target:self selector:@selector(restartTapped:)];
-    spendcoinsItem.position = ccp(winSize.width/2, winSize.height - 400);
-    CCMenuItemLabel *achievementsItem = [CCMenuItemLabel itemWithLabel:achievements target:self selector:@selector(achievementsTapped:)];
-    achievementsItem.position = ccp(winSize.width/2,  winSize.height - 430);
-    CCMenuItemLabel *mainmenuItem = [CCMenuItemLabel itemWithLabel:mainmenu target:self selector:@selector(mainmenuTapped:)];
-    mainmenuItem.position = ccp(winSize.width/2,  winSize.height - 460);
-    
-    
-    CCMenu *menu = [CCMenu menuWithItems:playagainItem,spendcoinsItem,achievementsItem,mainmenuItem, nil];
-    menu.position = CGPointZero;
-    [gameOverLayer addChild:menu z:999];
-    
-    //[restartItem runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
-    //[label runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
     [self addChild:gameOverLayer z:999];
     
     [self unscheduleUpdate];
@@ -1556,13 +1408,11 @@
 }
 
 -(void)equipTap:(UIGestureRecognizer *)gestureRecognizer{
-   
     CGPoint tapPoint = [gestureRecognizer locationInView:gestureRecognizer.view];
     tapPoint = [[CCDirector sharedDirector] convertToGL:tapPoint];
     CGRect tapper = CGRectMake(tapPoint.x, tapPoint.y, 1, 1);
     CGRect pauseRect = startButton.boundingBox;
     if(CGRectIntersectsRect(tapper, pauseRect)){
-        NSLog(@"%@", @"paaasue");
         [self performSelector:@selector(pause:)];
     }else{
     
@@ -1576,7 +1426,7 @@
         [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsTrainingWheels percentComplete:100.0];
     }else{
     
-    if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1 && equipment.visible){
+    if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1 && equipment.visible && tapCount == 0 && !icarus){
         if([equipmentName isEqualToString:@"mjolnir"]){
             [equipment runAction:[CCRepeat actionWithAction:[CCRotateBy actionWithDuration:.4 angle:360] times:3]];
             CGPoint point = [gestureRecognizer locationInView:gestureRecognizer.view];
@@ -1656,45 +1506,8 @@
 }
 
 -(void)ccTouchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
-    CGSize winSize = [CCDirector sharedDirector].winSize;
-    
-    
         if(!jumping && _man.position.y == jumpOrigin && !fallen){
-           /* if(_shipPointsPerSecY > 0){
-                NSMutableArray *punchArray = [NSMutableArray array];
-                for(int i = 1; i <= 3; ++i) {
-                    [punchArray addObject:
-                    [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                    [NSString stringWithFormat:@"yetiPunching%d.png", i]]];
-                }
-                CCAnimation *punch = [CCAnimation animationWithFrames:punchArray delay:0.1f];
-                [_man runAction:[CCAnimate actionWithAnimation:punch restoreOriginalFrame:YES]];
-            }else{
-                NSMutableArray *punchArray = [NSMutableArray array];
-                for(int i = 4; i <= 6; ++i) {
-                    [punchArray addObject:
-                     [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                      [NSString stringWithFormat:@"yetiPunching%d.png", i]]];
-                }
-                CCAnimation *punch = [CCAnimation animationWithFrames:punchArray delay:0.1f];
-                [_man runAction:[CCAnimate actionWithAnimation:punch restoreOriginalFrame:YES]];
-            }
-            
-            for (CCSprite *tree in _trees) {
-                CGRect treeRect = CGRectMake(tree.boundingBox.origin.x, tree.boundingBox.origin.y, tree.boundingBox.size.width, tree.boundingBox.size.height);
-                CGRect manrect = CGRectMake(_man.boundingBox.origin.x, _man.boundingBox.origin.y, _man.boundingBox.size.width, _man.boundingBox.size.height);
-                if (CGRectIntersectsRect(manrect, treeRect) && !hitTime && tree.zOrder > 700) {
-                    NSMutableArray *treeArray = [NSMutableArray array];
-                    for(int i = 1; i <= 3; ++i) {
-                        [treeArray addObject:
-                         [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-                          [NSString stringWithFormat:@"tree_break%d.png", i]]];
-                    }
-                    CCAnimation *treebreak = [CCAnimation animationWithFrames:treeArray delay:0.05f];
-                    tree.position = ccp(tree.position.x - 45, tree.position.y);
-                    [tree runAction:[CCAnimate actionWithAnimation:treebreak restoreOriginalFrame:NO]];
-                }
-            }*/
+           
         }if(fallen && tapCount < 10 && !caught && !dead && ![[CCDirector sharedDirector] isPaused]){
             tapCount++;
             NSMutableArray *getupArray = [NSMutableArray array];
@@ -1713,8 +1526,13 @@
                  [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
                   [NSString stringWithFormat:@"yetifalling%d.png", i]]];
             }
+            id setSprites = [CCCallBlock actionWithBlock:^{
+                [self turnBoard];
+            }];
             CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
-            [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+            id animateFalling = [CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO];
+            CCSequence *getUpAction = [CCSequence actions:animateFalling, setSprites, nil];
+            [_man runAction:getUpAction];
             [trail resetSystem];
             hitTime = NO;
             fallen = NO;
@@ -1723,7 +1541,8 @@
            // [self scheduleUpdate];
             [self schedule:@selector(updateTimer) interval:.3];
             [self schedule:@selector(updateBg) interval:.1];
-            tapCount = 0;
+            //tapCount = 0;
+            [self schedule:@selector(tapCountReset) interval:.5];
             [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsChumbawumba percentComplete:100.0];
         }
     
@@ -1732,11 +1551,10 @@
 -(void)swipe{
     if(!jumping && _man.position.y == jumpOrigin && !fallen && ![[CCDirector sharedDirector] isPaused]){
         _man.scale = 1.1;
-        //[[SimpleAudioEngine sharedEngine] playEffect:@"jump.wav"];
+        [[SimpleAudioEngine sharedEngine] playEffect:@"jump.wav"];
         jumping = YES;
         [self schedule:@selector(jumper) interval:.2];
         [trail stopSystem];
-        
         ySpeed = 4;
         [self doJump];
     }
@@ -1845,7 +1663,13 @@
     [self unschedule:@selector(hitTime)];
 }
 
+-(void)tapCountReset{
+    tapCount = 0;
+    [self unschedule:@selector(tapCountReset)];
+}
+
 -(void)switchEquipment{
+    CGSize winSize = [CCDirector sharedDirector].winSize;
     [self removeChild:equipment cleanup:YES];
     NSString *path=[[NSBundle mainBundle] pathForResource:@"equipment" ofType:@"plist"];
     equipmentDic = [NSDictionary dictionaryWithContentsOfFile:path];
@@ -1882,11 +1706,62 @@
         [self reorderChild:lighting z:479];
     }];
     id lightShow = [CCAnimate actionWithAnimation:light restoreOriginalFrame:NO];
+    [self removeChild:equipmentText cleanup:YES];
+    equipmentText = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @"_text.png"]];
+    [equipmentText setPosition:ccp(winSize.width/2, winSize.height - equipmentText.contentSize.height/2 - 30)];
+    [equipmentText.texture setAliasTexParameters];
+    [self addChild:equipmentText z:600];
+    equipmentText.scale = 0;
     [equipmentText runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
     [self reorderChild:lighting z:481];
     CCSequence *lightAction = [CCSequence actions:lightShow, lightClean, nil];
     [lighting runAction:lightAction];
     
+}
+
+-(void)turnBoard{
+    if(_shipPointsPerSecY < 0 && _previousPointsPerSec >= 0 && _man.position.y == jumpOrigin){
+        NSMutableArray *leftturnArray = [NSMutableArray array];
+        for(int i = 1; i <= 9; ++i) {
+            [leftturnArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"yetiTurning0%d.png", i]]];
+        }
+        
+        leftturn = [CCAnimation animationWithFrames:leftturnArray delay:0.05f];
+        [_man runAction:[CCAnimate actionWithAnimation:leftturn restoreOriginalFrame:NO]];
+        
+        NSMutableArray *leftboardturnArray = [NSMutableArray array];
+        for(int i = 1; i <= 9; ++i) {
+            [leftboardturnArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"board_turning0%d.png", i]]];
+        }
+        
+        boardleftturn = [CCAnimation animationWithFrames:leftboardturnArray delay:0.05f];
+        [_board runAction:[CCAnimate actionWithAnimation:boardleftturn restoreOriginalFrame:NO]];
+        _previousPointsPerSec = _shipPointsPerSecY;
+    }else if (_shipPointsPerSecY > 0 && _previousPointsPerSec <= 0 && _man.position.y == jumpOrigin){
+        NSMutableArray *rightturnArray = [NSMutableArray array];
+        for(int i = 9; i >= 1; --i) {
+            [rightturnArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"yetiTurning0%d.png", i]]];
+        }
+        rightturn = [CCAnimation animationWithFrames:rightturnArray delay:0.05f];
+        [_man runAction:[CCAnimate actionWithAnimation:rightturn restoreOriginalFrame:NO]];
+        
+        NSMutableArray *rightboardturnArray = [NSMutableArray array];
+        for(int i = 9; i >= 1; --i) {
+            [rightboardturnArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"board_turning0%d.png", i]]];
+        }
+        
+        boardrightturn = [CCAnimation animationWithFrames:rightboardturnArray delay:0.05f];
+        [_board runAction:[CCAnimate actionWithAnimation:boardrightturn restoreOriginalFrame:NO]];
+        _previousPointsPerSec = _shipPointsPerSecY;
+    }
 }
 
 // on "dealloc" you need to release all your retained objects

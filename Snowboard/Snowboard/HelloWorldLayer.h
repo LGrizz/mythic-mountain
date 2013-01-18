@@ -9,6 +9,8 @@
 
 // When you import this file, you import all the cocos2d classes
 #import "cocos2d.h"
+#import "PauseLayer.h"
+#import "GameOverLayer.h"
 
 typedef enum {
     kEndReasonWin,
@@ -123,7 +125,8 @@ typedef enum {
     CCMenuItemSprite *startButton;
     
     CCMenu *pauseMenu;
-    CCLayer *pauseLayer;
+    PauseLayer *pauseLayer;
+    GameOverLayer *gameOverLayer;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
