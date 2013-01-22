@@ -40,9 +40,11 @@
         [gameoverTrapper runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:gameovertrapperpump restoreOriginalFrame:NO]]];
         
         CCSprite *gameoverCage = [CCSprite spriteWithFile:@"yeti_cage1.png"];
-        gameoverCage.position = ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2);
+        gameoverCage.position = ccp(220, winSize.height+120);
         [gameoverCage.texture setAliasTexParameters];
         [self addChild:gameoverCage z:996];
+        
+        [gameoverCage runAction:[CCMoveTo actionWithDuration:1.2 position:ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2)]];
         
         NSMutableArray *gameoverCageArray = [NSMutableArray array];
         for(int i = 1; i <= 2; ++i) {

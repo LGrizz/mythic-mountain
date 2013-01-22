@@ -35,6 +35,11 @@ typedef enum {
     CCSprite *equipment;
     CCSprite *equipmentText;
     CCSprite *hillEquipment;
+    CCSprite *cabin;
+    CCSprite *smoke;
+    CCSprite *dummy1;
+    CCSprite *dummy2;
+    CCSprite *dummy3;
     
     CCParallaxNode *_backgroundNode;
     CCSprite *_background1;
@@ -110,6 +115,8 @@ typedef enum {
     
     BOOL hitTime;
     BOOL icarus;
+    BOOL midas;
+    BOOL begin;
     
     CCLabelTTF *_label;
     
@@ -121,6 +128,7 @@ typedef enum {
     CCGestureRecognizer *singleTap;
     
     NSString *equipmentName;
+    NSString *characterName;
     NSDictionary *equipmentDic;
     CCMenuItemSprite *startButton;
     

@@ -53,6 +53,11 @@
     if([[SettingsManager sharedSettingsManager] getString:@"equipment"] == nil){
         [[SettingsManager sharedSettingsManager] setStringValue:@"hammer" name:@"equipment"];
     }
+    if([[SettingsManager sharedSettingsManager] getString:@"character"] == nil){
+        [[SettingsManager sharedSettingsManager] setStringValue:@"yeti" name:@"character"];
+    }
+    
+    [MythicMtnIAPHelper sharedHelper];
         
 	// Init the window
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

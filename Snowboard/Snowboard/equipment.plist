@@ -2,18 +2,31 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>midas</key>
+	<dict>
+		<key>frames</key>
+		<string>8</string>
+		<key>anchorY</key>
+		<string>-0.5</string>
+		<key>anchorX</key>
+		<string>0.5</string>
+		<key>x</key>
+		<string>0</string>
+		<key>y</key>
+		<string>10</string>
+	</dict>
 	<key>icarus</key>
 	<dict>
 		<key>y</key>
 		<string>29</string>
 		<key>x</key>
 		<string>0</string>
-		<key>frames</key>
-		<string>8</string>
 		<key>anchorX</key>
 		<string>0.5</string>
 		<key>anchorY</key>
 		<string>0.5</string>
+		<key>frames</key>
+		<string>8</string>
 	</dict>
 	<key>mjolnir</key>
 	<dict>

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MythicMtnIAPHelper.h"
 
 @class RootViewController;
 

@@ -10,6 +10,8 @@
 
 @interface StoreScene : CCLayer
 {
+    CCLabelTTF *coinScoreLabel;
+    
 }
 
 +(id) scene;
