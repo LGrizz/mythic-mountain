@@ -116,7 +116,7 @@ static CCTexture2DPixelFormat defaultAlphaPixelFormat_ = kCCTexture2DPixelFormat
 		glGenTextures(1, &name_);
 		glBindTexture(GL_TEXTURE_2D, name_);
 
-		[self setAntiAliasTexParameters];
+		[self setAliasTexParameters];
 		
 		// Specify OpenGL texture image
 		
@@ -605,7 +605,7 @@ static BOOL PVRHaveAlphaPremultiplied_ = NO;
 		glGenTextures(1, &name_);
 		glBindTexture(GL_TEXTURE_2D, name_);
 		
-		[self setAntiAliasTexParameters];
+		[self setAliasTexParameters];
 		
 		GLenum format;
 		GLsizei size = length * length * bpp / 8;
@@ -649,7 +649,7 @@ static BOOL PVRHaveAlphaPremultiplied_ = NO;
 			
 			[pvr release];
 			
-			[self setAntiAliasTexParameters];
+			[self setAliasTexParameters];
 		} else {
 			
 			CCLOG(@"cocos2d: Couldn't load PVR image: %@", file);

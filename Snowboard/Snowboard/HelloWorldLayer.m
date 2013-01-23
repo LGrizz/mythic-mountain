@@ -84,7 +84,6 @@
             equipmentName = @"icarus";
             [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"wings.plist"];
             CCSpriteBatchNode *wingSheet = [CCSpriteBatchNode batchNodeWithFile:@"wings.png"];
-            [wingSheet.texture setAliasTexParameters];
             [self addChild:wingSheet];
         }else if([[[SettingsManager sharedSettingsManager] getString:@"equipment"] isEqualToString:@"midas"]){
             equipmentName = @"midas";
@@ -110,118 +109,102 @@
         icarus = NO;
         oneUse = NO;
         midas = NO;
+        firstCliff = YES;
         
         //Character Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@turn.plist", characterName]];
         CCSpriteBatchNode *yetispriteSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@turn.png", characterName]];
-        [yetispriteSheet.texture setAliasTexParameters];
         [self addChild:yetispriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@jumpright.plist", characterName]];
         CCSpriteBatchNode *jumpspriteSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@jumpright.plist", characterName]];
-        [jumpspriteSheet.texture setAliasTexParameters];
         [self addChild:jumpspriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@jumpleft.plist", characterName]];
         CCSpriteBatchNode *jumpleftspriteSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@jumpleft.plist", characterName]];
-        [jumpleftspriteSheet.texture setAliasTexParameters];
         [self addChild:jumpleftspriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@falling.plist", characterName]];
         CCSpriteBatchNode *fallingpriteSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@falling.plist", characterName]];
-        [fallingpriteSheet.texture setAliasTexParameters];
         [self addChild:fallingpriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@_getup.plist", characterName]];
         CCSpriteBatchNode *getUpSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@_getup.plist", characterName]];
-        [getUpSheet.texture setAliasTexParameters];
         [self addChild:getUpSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_punch.plist"];
         CCSpriteBatchNode *punchSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_punch.png"];
-        [punchSheet.texture setAliasTexParameters];
         [self addChild:punchSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_cage.plist"];
         CCSpriteBatchNode *cageSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_cage.png"];
-        [cageSheet.texture setAliasTexParameters];
         [self addChild:cageSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_running.plist"];
+        CCSpriteBatchNode *yetiRunningSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_running.png"];
+        [self addChild:yetiRunningSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"unicorn_running.plist"];
+        CCSpriteBatchNode *unicornRunningSheet = [CCSpriteBatchNode batchNodeWithFile:@"unicorn_running.png"];
+        [self addChild:unicornRunningSheet];
         
         //Board Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardturn.plist"];
         CCSpriteBatchNode *boardspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiboardturn.png"];
-        [boardspriteSheet.texture setAliasTexParameters];
         [self addChild:boardspriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardjump.plist"];
         CCSpriteBatchNode *boardjumpspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiboardjump.png"];
-        [boardjumpspriteSheet.texture setAliasTexParameters];
         [self addChild:boardjumpspriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yetiboardjumpleft.plist"];
         CCSpriteBatchNode *boardjumpleftspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"yetiboardjumpleft.png"];
-        [boardjumpleftspriteSheet.texture setAliasTexParameters];
         [self addChild:boardjumpleftspriteSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"boardbreak.plist"];
+        CCSpriteBatchNode *boardBreakSheet = [CCSpriteBatchNode batchNodeWithFile:@"boardbreak.png"];
+        [self addChild:boardBreakSheet];
         
         //Hill Object Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"coinspin.plist"];
         CCSpriteBatchNode *coinspriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"coinspin.png"];
-        [coinspriteSheet.texture setAliasTexParameters];
         [self addChild:coinspriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"coinspins.plist"];
         CCSpriteBatchNode *coinpriteSheet = [CCSpriteBatchNode batchNodeWithFile:@"coinspins.png"];
-        [coinpriteSheet.texture setAliasTexParameters];
         [self addChild:coinpriteSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"treebreak.plist"];
         CCSpriteBatchNode *treebreakSheet = [CCSpriteBatchNode batchNodeWithFile:@"treebreak.png"];
-        [treebreakSheet.texture setAliasTexParameters];
         [self addChild:treebreakSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"explode.plist"];
         CCSpriteBatchNode *explodeSheet = [CCSpriteBatchNode batchNodeWithFile:@"explode.png"];
-        [explodeSheet.texture setAliasTexParameters];
         [self addChild:explodeSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"coinExplode.plist"];
         CCSpriteBatchNode *coinExplodeSheet = [CCSpriteBatchNode batchNodeWithFile:@"coinExplode.png"];
-        [coinExplodeSheet.texture setAliasTexParameters];
         [self addChild:coinExplodeSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"smoke.plist"];
         CCSpriteBatchNode *smokeSheet = [CCSpriteBatchNode batchNodeWithFile:@"smoke.png"];
-        [smokeSheet.texture setAliasTexParameters];
         [self addChild:smokeSheet];
 
         //Enemy Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"heli.plist"];
         CCSpriteBatchNode *heliSheet = [CCSpriteBatchNode batchNodeWithFile:@"heli.png"];
-        [heliSheet.texture setAliasTexParameters];
         [self addChild:heliSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"ladder.plist"];
         CCSpriteBatchNode *ladderSheet = [CCSpriteBatchNode batchNodeWithFile:@"ladder.png"];
-        [ladderSheet.texture setAliasTexParameters];
         [self addChild:ladderSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"trapper.plist"];
         CCSpriteBatchNode *trapperSheet = [CCSpriteBatchNode batchNodeWithFile:@"trapper.png"];
-        [trapperSheet.texture setAliasTexParameters];
         [self addChild:trapperSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"gameovertrapper.plist"];
         CCSpriteBatchNode *gameovertrapperSheet = [CCSpriteBatchNode batchNodeWithFile:@"gameovertrapper.png"];
-        [gameovertrapperSheet.texture setAliasTexParameters];
         [self addChild:gameovertrapperSheet];
         
         //Background Animations
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"excalibur", @"_lighting.plist"]];
         CCSpriteBatchNode *lightingSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"excalibur", @"_lighting.png"]];
-        [lightingSheet.texture setAliasTexParameters];
         [self addChild:lightingSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"mjolnir", @"_lighting.plist"]];
         CCSpriteBatchNode *lightingSheet2 = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"mjolnir", @"_lighting.png"]];
-        [lightingSheet2.texture setAliasTexParameters];
         [self addChild:lightingSheet2];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"icarus", @"_lighting.plist"]];
         CCSpriteBatchNode *lightingSheet3 = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"icarus" , @"_lighting.png"]];
-        [lightingSheet3.texture setAliasTexParameters];
         [self addChild:lightingSheet3];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@%@", @"midas", @"_lighting.plist"]];
         CCSpriteBatchNode *lightingSheet4 = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@%@", @"midas" , @"_lighting.png"]];
-        [lightingSheet4.texture setAliasTexParameters];
         [self addChild:lightingSheet4];
         
         
         _man = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", characterName]];  // 4
         _board = [CCSprite spriteWithFile:@"board_turning01.png"];  
-        [_man.texture setAliasTexParameters];
-        [_board.texture setAliasTexParameters];
         CGSize winSize = [CCDirector sharedDirector].winSize; // 5
         _man.position = ccp(100, winSize.height - 200); // 6
         begin = YES;
@@ -235,9 +218,6 @@
         dummy1 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", @"unicorn"]];  // 4
         dummy2 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", characterName]];
         dummy3 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", @"yeti"]];
-        [dummy1.texture setAliasTexParameters];
-        [dummy2.texture setAliasTexParameters];
-        [dummy3.texture setAliasTexParameters];
         dummy1.position = ccp(100, winSize.height - 190);
         dummy2.position = ccp(100, winSize.height - 190);
         dummy3.position = ccp(100, winSize.height - 190);
@@ -245,6 +225,27 @@
         [self addChild:dummy1 z:900];
         [self addChild:dummy2 z:900];
         [self addChild:dummy3 z:900];
+        
+        NSMutableArray *yetiRunArray = [NSMutableArray array];
+        for(int i = 1; i <= 2; ++i) {
+            [yetiRunArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"yetiRunning%d.png", i]]];
+        }
+        
+        CCAnimation *yetiRun = [CCAnimation animationWithFrames:yetiRunArray delay:0.2f];
+        [dummy3 runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:yetiRun restoreOriginalFrame:NO]]];
+        
+        NSMutableArray *uniRunArray = [NSMutableArray array];
+        for(int i = 1; i <= 2; ++i) {
+            [uniRunArray addObject:
+             [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+              [NSString stringWithFormat:@"unicornRunning%d.png", i]]];
+        }
+        
+        CCAnimation *uniRun = [CCAnimation animationWithFrames:uniRunArray delay:0.2f];
+        [dummy1 runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:uniRun restoreOriginalFrame:NO]]];
+        [dummy2 runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:uniRun restoreOriginalFrame:NO]]];
         
         dropShadowBoardSprite = [CCSprite spriteWithSpriteFrame:[_board displayedFrame]];
         [dropShadowBoardSprite setOpacity:100];
@@ -256,12 +257,10 @@
         [self addChild:_board z:899];
         
         cabin = [CCSprite spriteWithFile:@"cabin.png"];
-        [cabin.texture setAliasTexParameters];
         cabin.position = ccp(0 + cabin.boundingBox.size.width/2, winSize.height - 130);
         [self addChild:cabin z:900];
         
         smoke = [CCSprite spriteWithFile:@"smoke1.png"];
-        [smoke.texture setAliasTexParameters];
         smoke.position = ccp(78, winSize.height - 70);
         [self addChild:smoke z:899];
         
@@ -276,7 +275,6 @@
         [smoke runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:smokeAn restoreOriginalFrame:NO]]];
         
         equipment = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @".png"]];
-        [equipment.texture setAliasTexParameters];
         equipment.position = ccp(_man.position.x + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"x"] intValue], _man.position.y + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"y"] intValue]);
         equipment.anchorPoint = ccp(([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorX"] floatValue]), ([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorY"] floatValue]));
         [self addChild:equipment z:900];
@@ -356,12 +354,10 @@
         
         lighting = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @"_bg_animation6.png"]];
         [lighting setPosition:ccp(winSize.width/2, winSize.height - lighting.contentSize.height/2)];
-        [lighting.texture setAliasTexParameters];
         [self addChild:lighting z:479];
         
         equipmentText = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @"_text.png"]];
         [equipmentText setPosition:ccp(winSize.width/2, winSize.height - equipmentText.contentSize.height/2 - 30)];
-        [equipmentText.texture setAliasTexParameters];
         [self addChild:equipmentText z:600];
         equipmentText.scale = 0;
         
@@ -387,7 +383,6 @@
                 tree = [CCSprite spriteWithFile:@"treeArch.png"];
             }*/
             tree = [CCSprite spriteWithFile:@"tree_break1.png"];
-            [tree.texture setAliasTexParameters];
             tree.visible = NO;
             [self addChild:tree z:490];
             [_trees addObject:tree];
@@ -398,7 +393,6 @@
             CCSprite *rock;
             rock = [CCSprite spriteWithFile:@"rock.png"];
             rock.visible = NO;
-            [rock.texture setAliasTexParameters];
             [self addChild:rock z:898];
             [_rocks addObject:rock];
         }
@@ -408,7 +402,6 @@
             CCSprite *spike;
             spike = [CCSprite spriteWithFile:@"spikes.png"];
             spike.visible = NO;
-            [spike.texture setAliasTexParameters];
             [self addChild:spike z:898];
             [_spikes addObject:spike];
         }
@@ -418,7 +411,6 @@
             CCSprite *coin;
             coin = [CCSprite spriteWithFile:@"coin01.png"];
             coin.visible = NO;
-            [coin.texture setAliasTexParameters];
             [self addChild:coin z:898];
             [_coins addObject:coin];
         }
@@ -428,7 +420,6 @@
             CCSprite *ice;
             ice = [CCSprite spriteWithFile:@"ice.png"];
             ice.visible = NO;
-            [ice.texture setAliasTexParameters];
             [self addChild:ice z:898];
             [_ices addObject:ice];
         }
@@ -438,14 +429,12 @@
             CCSprite *arch;
             arch = [CCSprite spriteWithFile:@"treeArch.png"];
             arch.visible = NO;
-            [arch.texture setAliasTexParameters];
             [self addChild:arch z:898];
             [_arches addObject:arch];
         }
         
         cliff = [CCSprite spriteWithFile:@"jump.png"];
         cliff.visible = NO;
-        [cliff.texture setAliasTexParameters];
         [self addChild:cliff z:898];
         
         _lives = 4;
@@ -453,7 +442,10 @@
         _backgroundSpeed = 3000;
         _randDuration = 2.3;
         
+        if([characterName isEqualToString:@"yeti"])
         trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail4.plist"];
+        if([characterName isEqualToString:@"unicorn"])
+            trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail6.plist"];
         trail.positionType=kCCPositionTypeFree;
 		trail.position=ccp(_man.position.x, _man.position.y-10);
         
@@ -489,10 +481,28 @@
         
         [self addChild:coinScoreLabel z:999];
         
+        getUpMessage = [CCLabelBMFont labelWithString:@"Tap\nto\nget\nup" fntFile:@"prompts_uni32.fnt" width:200 alignment:UITextAlignmentCenter];
+        getUpMessage.position = ccp(winSize.width/2, winSize.height - 380);
+        getUpMessage.anchorPoint = ccp(0.5f,0.5f);
+        getUpMessage.scale = 0;
+        [self addChild:getUpMessage z:999];
+        
+        startMessage = [CCLabelBMFont labelWithString:@"Tap to start" fntFile:@"prompts_uni32.fnt" width:300 alignment:UITextAlignmentCenter];
+        startMessage.position = ccp(winSize.width/2, winSize.height - 380);
+        startMessage.anchorPoint = ccp(0.5f,0.5f);
+        [self addChild:startMessage z:999];
+        
+        jumpMessage = [CCLabelBMFont labelWithString:@"Swipe up to jump" fntFile:@"prompts_uni32.fnt" width:350 alignment:UITextAlignmentCenter];
+        jumpMessage.anchorPoint = ccp(0.5f,0.5f);
+        jumpMessage.visible = NO;
+        [self addChild:jumpMessage z:999];
+        
         _previousPointsPerSec = 0;
         
         singleTap = [CCGestureRecognizer CCRecognizerWithRecognizerTargetAction:[[[UITapGestureRecognizer alloc]init] autorelease] target:self action:@selector(equipTap:)];
         [self addGestureRecognizer:singleTap];
+        
+        [self schedule:@selector(moveClouds) interval:.01];
     }
     return self;
 }
@@ -533,24 +543,6 @@
     CGSize winSize = [CCDirector sharedDirector].winSize;
     float maxX = winSize.width - _man.contentSize.width/2;
     float minX = _man.contentSize.width/2;
-    
-    if(cloud1.position.x > winSize.width){
-        cloud1.position = ccp(-50, cloud1.position.y);
-    }else{
-        cloud1.position = ccp(cloud1.position.x + .8, cloud1.position.y);
-    }
-    
-    if(cloud2.position.x < -50){
-        cloud2.position = ccp(winSize.width+50, cloud2.position.y);
-    }else{
-        cloud2.position = ccp(cloud2.position.x - .7, cloud2.position.y);
-    }
-    
-    if(cloud3.position.x > winSize.width){
-        cloud3.position = ccp(-50, cloud3.position.y);
-    }else{
-        cloud3.position = ccp(cloud3.position.x + .6, cloud3.position.y);
-    }
     
     if(!fallen){
     
@@ -659,6 +651,15 @@
     }else{
         cabin.position = ccpAdd(cabin.position, ccpMult(asteroidScrollVelDown, dt));
         smoke.position = ccpAdd(smoke.position, ccpMult(asteroidScrollVelDown, dt));
+    }
+        
+    if(jumpMessage.position.y > winSize.height - 150 && jumpMessage.zOrder > 490){
+        [self reorderChild:jumpMessage z:490];
+        jumpMessage.position = ccpSub(jumpMessage.position, ccpMult(asteroidScrollVelDown, dt));
+    }else if(jumpMessage.zOrder == 490){
+        jumpMessage.position = ccpSub(jumpMessage.position, ccpMult(asteroidScrollVelDown, dt));
+    }else{
+        jumpMessage.position = ccpAdd(jumpMessage.position, ccpMult(asteroidScrollVel, dt));
     }
 
     [self turnBoard];
@@ -849,7 +850,6 @@
     
     if(bigJump && hitJump){
         bigCliff = [CCSprite spriteWithFile:@"Big_jump.png"];
-        [bigCliff.texture setAliasTexParameters];
         hitJump = NO;
         bigCliff.position = ccp(winSize.width/2, -450);
         [self addChild:bigCliff z:898];
@@ -872,7 +872,12 @@
                 hillEquipment.userData = @"icarus";
                 break;
         }
-        [hillEquipment.texture setAliasTexParameters];
+        if(firstCliff){
+            jumpMessage.position = ccp(winSize.width/2, -750);
+            jumpMessage.visible = YES;
+            [self reorderChild:jumpMessage z:999];
+            firstCliff = NO;
+        }
         hillEquipment.position = ccp(winSize.width/2, -350);
         [self addChild:hillEquipment z:899];
     }
@@ -1079,6 +1084,14 @@
             CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
             [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
             [_man runAction:[CCMoveTo actionWithDuration:0.4 position:ccp(_man.position.x, _man.position.y-40)]];
+            NSMutableArray *boardArray = [NSMutableArray array];
+            for(int i = 1; i <= 3; ++i) {
+                [boardArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"board_breaking%d.png", i]]];
+            }
+            CCAnimation *breaking = [CCAnimation animationWithFrames:boardArray delay:0.08f];
+            [_board runAction:[CCAnimate actionWithAnimation:breaking restoreOriginalFrame:NO]];
             dropShadowSprite.visible = NO;
             dropShadowBoardSprite.visible = NO;
             ARCH_OPTIMAL_PARTICLE_SYSTEM *fall = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"fall2.plist"];
@@ -1178,6 +1191,14 @@
             [self unschedule:@selector(updateBg)];
             CCAnimation *falling = [CCAnimation animationWithFrames:fallingArray delay:0.08f];
             [_man runAction:[CCAnimate actionWithAnimation:falling restoreOriginalFrame:NO]];
+            NSMutableArray *boardArray = [NSMutableArray array];
+            for(int i = 1; i <= 3; ++i) {
+                [boardArray addObject:
+                 [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
+                  [NSString stringWithFormat:@"board_breaking%d.png", i]]];
+            }
+            CCAnimation *breaking = [CCAnimation animationWithFrames:boardArray delay:0.08f];
+            [_board runAction:[CCAnimate actionWithAnimation:breaking restoreOriginalFrame:NO]];
             dropShadowSprite.visible = NO;
             dropShadowBoardSprite.visible = NO;
             [trail stopSystem];
@@ -1533,14 +1554,15 @@
         [dummy2 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.4],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy2 z:906];}],[CCMoveTo actionWithDuration:1.5 position:ccp(winSize.width + 30, dummy2.position.y - 5)], nil]];
         [dummy3 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.6],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy3 z:906];}],[CCMoveTo actionWithDuration:1.1 position:ccp(winSize.width + 30, dummy2.position.y - 30)], nil]];
         [self runAction:[CCSequence actions:[CCCallBlock actionWithBlock:^{[self reorderChild:_man z:907];[self reorderChild:_board z:906];}],[CCDelayTime actionWithDuration:5],[CCCallBlock actionWithBlock:^{[self reorderChild:_man z:900];[self reorderChild:_board z:899];}], nil]];
-        [self addChild:trail z:898];
-        [trail resetSystem];
+        [self addChild:trail z:899];
+        //[trail resetSystem];
         [self scheduleUpdate];
         [self schedule:@selector(updateTimer) interval:.3];
         [self schedule:@selector(updateBg) interval:.1];
         _started = YES;
-        [self schedule:@selector(firstFall) interval:.4];
+        [self schedule:@selector(firstFall) interval:.2];
         [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsTrainingWheels percentComplete:100.0];
+        [startMessage runAction:[CCScaleTo actionWithDuration:.5 scale:0]];
     }else{
     
     if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1 && equipment.visible && tapCount == 0 && !icarus){
@@ -1682,6 +1704,7 @@
             //tapCount = 0;
             [self schedule:@selector(tapCountReset) interval:.5];
             [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsChumbawumba percentComplete:100.0];
+            [getUpMessage runAction:[CCScaleTo actionWithDuration:.5 scale:0]];
         }
     
 }
@@ -1821,12 +1844,10 @@
         equipmentName = @"icarus";
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"wings.plist"];
         CCSpriteBatchNode *wingSheet = [CCSpriteBatchNode batchNodeWithFile:@"wings.png"];
-        [wingSheet.texture setAliasTexParameters];
         [self addChild:wingSheet];
     }
     
     equipment = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @".png"]];
-    [equipment.texture setAliasTexParameters];
     equipment.position = ccp(_man.position.x + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"x"] intValue], _man.position.y + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"y"] intValue]);
     equipment.anchorPoint = ccp(([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorX"] floatValue]), ([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorY"] floatValue]));
     [self addChild:equipment z:899];
@@ -1848,7 +1869,6 @@
     [self removeChild:equipmentText cleanup:YES];
     equipmentText = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @"_text.png"]];
     [equipmentText setPosition:ccp(winSize.width/2, winSize.height - equipmentText.contentSize.height/2 - 30)];
-    [equipmentText.texture setAliasTexParameters];
     [self addChild:equipmentText z:600];
     equipmentText.scale = 0;
     [equipmentText runAction:[CCScaleTo actionWithDuration:0.5 scale:1.0]];
@@ -1903,13 +1923,6 @@
     }
 }
 
--(void)reorderDummys{
-    [self reorderChild:dummy1 z:906];
-    [self reorderChild:dummy2 z:906];
-    [self reorderChild:dummy3 z:906];
-    [self unschedule:@selector(reorderDummys)];
-}
-
 -(void)firstFall{
     //[[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
     [_board stopAllActions];
@@ -1934,6 +1947,30 @@
     [self addChild:fall z:899];
     fallen = true;
     [self unschedule:@selector(firstFall)];
+    [getUpMessage runAction:[CCScaleTo actionWithDuration:.5 scale:1]];
+    [getUpMessage runAction:[CCRepeatForever actionWithAction:[CCSequence actions:[CCFadeTo actionWithDuration:.3 opacity:100], [CCDelayTime actionWithDuration:.2],[CCFadeTo actionWithDuration:.3 opacity:255], nil]]];
+}
+
+-(void)moveClouds{
+    CGSize winSize = [CCDirector sharedDirector].winSize;
+    
+    if(cloud1.position.x > winSize.width){
+        cloud1.position = ccp(-50, cloud1.position.y);
+    }else{
+        cloud1.position = ccp(cloud1.position.x + .8, cloud1.position.y);
+    }
+    
+    if(cloud2.position.x < -50){
+        cloud2.position = ccp(winSize.width+50, cloud2.position.y);
+    }else{
+        cloud2.position = ccp(cloud2.position.x - .7, cloud2.position.y);
+    }
+    
+    if(cloud3.position.x > winSize.width){
+        cloud3.position = ccp(-50, cloud3.position.y);
+    }else{
+        cloud3.position = ccp(cloud3.position.x + .6, cloud3.position.y);
+    }
 }
 
 // on "dealloc" you need to release all your retained objects

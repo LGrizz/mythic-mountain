@@ -112,11 +112,15 @@ typedef enum {
     
     CCLabelTTF * scoreLabel;
     CCLabelTTF * coinScoreLabel;
+    CCLabelTTF * getUpMessage;
+    CCLabelTTF * startMessage;
+    CCLabelTTF * jumpMessage;
     
     BOOL hitTime;
     BOOL icarus;
     BOOL midas;
     BOOL begin;
+    BOOL firstCliff;
     
     CCLabelTTF *_label;
     

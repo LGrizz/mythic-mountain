@@ -1,0 +1,17 @@
+require 'rubygems'
+require 'betabuilder'
+
+BetaBuilder::Tasks.new do |config|
+  # your Xcode target name
+  config.target = "Snowboard"
+
+  # the Xcode configuration profile
+  config.configuration = "Release"
+
+  config.deploy_using(:testflight) do |tf|
+    	tf.api_token  = "379fc2c1c3a4530db3d4a513d783075f_NjY5MDg4MjAxMi0xMC0wOSAxNTozOTo0Ni4xOTg4Nzg"	# 
+  	tf.team_token = "415c19329a9a1bdba091c545b56deb61_NTg5OTAyMDEyLTAyLTAyIDExOjA5OjIyLjM4NDg4Mw"	# Decoder
+
+  end
+end
+
