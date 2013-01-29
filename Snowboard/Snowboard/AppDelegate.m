@@ -51,10 +51,17 @@
     
     [[SettingsManager sharedSettingsManager] load];
     if([[SettingsManager sharedSettingsManager] getString:@"equipment"] == nil){
-        [[SettingsManager sharedSettingsManager] setStringValue:@"hammer" name:@"equipment"];
+        [[SettingsManager sharedSettingsManager] setStringValue:@"none" name:@"equipment"];
     }
     if([[SettingsManager sharedSettingsManager] getString:@"character"] == nil){
         [[SettingsManager sharedSettingsManager] setStringValue:@"yeti" name:@"character"];
+    }
+    if([[SettingsManager sharedSettingsManager] getString:@"purchases"] == nil){
+        NSMutableArray *purchases = [[NSMutableArray alloc] initWithObjects:@"yeti", nil];
+        [[SettingsManager sharedSettingsManager] setArrayValue:purchases name:@"purchases"];
+    }
+    if([[SettingsManager sharedSettingsManager] getString:@"powerup"] == nil){
+        [[SettingsManager sharedSettingsManager] setStringValue:@"none" name:@"powerup"];
     }
     
     [MythicMtnIAPHelper sharedHelper];
@@ -140,7 +147,7 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [[SettingsManager sharedSettingsManager] load];
-	[[CCDirector sharedDirector] resume];
+	//[[CCDirector sharedDirector] resume];
 }
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {

@@ -80,10 +80,13 @@ dependencies: \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/libs/cocos2d/Support/CCFileUtils.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/libs/cocos2d/Support/CGPointExtension.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/libs/cocos2d/Support/ccUtils.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/CCScrollLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/OpaqueLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/HelloWorldLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/PauseLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/GameOverLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsManager.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/MainMenuScene.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/MythicMtnIAPHelper.h \
-  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/IAPHelper.h
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/IAPHelper.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/CCMenu+Layout.h

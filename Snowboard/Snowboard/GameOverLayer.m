@@ -11,17 +11,20 @@
 #import "MainMenuScene.h"
 #import "StoreScene.h"
 
-@implementation GameOverLayer
+@implementation GameOverLayer{
+    CCSprite *gameoverBg;
+    CCMenu *menu;
+}
 
 -(id)init:(int)distance coins:(int)coinScore {
     
     if ((self = [super init])) {
         CGSize winSize = [CCDirector sharedDirector].winSize;
         
-        CCSprite *gameoverBg = [CCSprite spriteWithFile:@"gameoverBg.png"];
+        gameoverBg = [CCSprite spriteWithFile:@"gameoverBg.png"];
         gameoverBg.anchorPoint = ccp(0.0f,1.0f);
         gameoverBg.position = ccp(0, winSize.height);
-        gameoverBg.opacity = 130;
+        gameoverBg.opacity = 160;
         [self addChild:gameoverBg z:990];
         
         CCSprite *gameoverTrapper = [CCSprite spriteWithFile:@"gameovertrapper1.png"];
@@ -44,7 +47,10 @@
         [gameoverCage.texture setAliasTexParameters];
         [self addChild:gameoverCage z:996];
         
-        [gameoverCage runAction:[CCMoveTo actionWithDuration:1.2 position:ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2)]];
+        id action = [CCMoveTo actionWithDuration:1.2 position:ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2)];
+        id ease = [CCEaseBounceOut actionWithAction:action];
+        [gameoverCage runAction: ease];
+        //[gameoverCage runAction:[CCMoveTo actionWithDuration:1.2 position:ccp(220, winSize.height-gameoverCage.boundingBox.size.height/2)]];
         
         NSMutableArray *gameoverCageArray = [NSMutableArray array];
         for(int i = 1; i <= 2; ++i) {
@@ -101,20 +107,54 @@
         mainmenuItem.position = ccp(winSize.width/2,  winSize.height - 460);
         
         
-        CCMenu *menu = [CCMenu menuWithItems:playagainItem,spendcoinsItem,achievementsItem,mainmenuItem, nil];
+        menu = [CCMenu menuWithItems:playagainItem,spendcoinsItem,achievementsItem,mainmenuItem, nil];
         menu.position = CGPointZero;
         [self addChild:menu z:999];
 
-    
+        [self setOpacityBlank:0];
+        [self setOpacity:255];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideStore) name:@"hideStore" object:nil];
+
     }
     return self;
 }
+
+// Set the opacity of all of our children that support it
+-(void) setOpacity: (GLubyte) opacity
+{
+    for( CCNode *node in [self children] )
+    {
+        if( [node conformsToProtocol:@protocol( CCRGBAProtocol)] )
+        {
+            //[(id<CCRGBAProtocol>) node setOpacity: opacity];
+            if(node != gameoverBg){
+                [node runAction:[CCFadeTo actionWithDuration:.5 opacity:opacity]];
+            }else{
+                [node runAction:[CCFadeTo actionWithDuration:.5 opacity:150]];
+            }
+        }
+    }
+}
+
+-(void) setOpacityBlank: (GLubyte) opacity
+{
+    for( CCNode *node in [self children] )
+    {
+        if( [node conformsToProtocol:@protocol( CCRGBAProtocol)] )
+        {
+            [(id<CCRGBAProtocol>) node setOpacity: opacity];
+        }
+    }
+}
+
 
 - (void)restartTapped:(id)sender {
     if([[CCDirector sharedDirector] isPaused]){
         [[CCDirector sharedDirector] resume];
     }
     [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)achievementsTapped:(id)sender {
@@ -126,13 +166,24 @@
         [[CCDirector sharedDirector] resume];
     }
     [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[MainMenuScene scene]]];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(void)showStore: (id)sender{
-    if([[CCDirector sharedDirector] isPaused]){
-        [[CCDirector sharedDirector] resume];
-    }
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[StoreScene scene]]];
+    CGSize winSize = [CCDirector sharedDirector].winSize;
+    StoreScene *store = [[StoreScene alloc] init];
+    
+    store.position = ccp(0, -winSize.height);
+    [self addChild:store z:999];
+    id action = [CCMoveTo actionWithDuration:.8 position:ccp(0, 0)];
+    id ease = [CCEaseIn actionWithAction:action rate:2];
+    [store runAction: ease];
+    
+    menu.isTouchEnabled = NO;
+}
+
+-(void)hideStore{
+    menu.isTouchEnabled = YES;
 }
 
 @end

@@ -40,6 +40,8 @@ typedef enum {
     CCSprite *dummy1;
     CCSprite *dummy2;
     CCSprite *dummy3;
+    CCSprite *griffin;
+    CCSprite *pheonix;
     
     CCParallaxNode *_backgroundNode;
     CCSprite *_background1;
@@ -121,6 +123,16 @@ typedef enum {
     BOOL midas;
     BOOL begin;
     BOOL firstCliff;
+    BOOL paused;
+    BOOL griffinB;
+    BOOL pheonixB;
+    BOOL jumped;
+    
+    int jumps;
+    int wings;
+    int chopper;
+    int hammerbreak;
+    int hammertime;
     
     CCLabelTTF *_label;
     
@@ -129,7 +141,10 @@ typedef enum {
     CCAnimation *boardleftturn;
     CCAnimation *boardrightturn;
     
+    CCSprite *pheonixAni;
+    
     CCGestureRecognizer *singleTap;
+    CCGestureRecognizer *horzRecognizer;
     
     NSString *equipmentName;
     NSString *characterName;
@@ -139,6 +154,9 @@ typedef enum {
     CCMenu *pauseMenu;
     PauseLayer *pauseLayer;
     GameOverLayer *gameOverLayer;
+    
+    CCAnimation *mtnRum;
+    CCSprite *mtnTop;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child

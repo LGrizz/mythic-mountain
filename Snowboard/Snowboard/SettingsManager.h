@@ -14,8 +14,10 @@
 
 -(NSString *)getString:(NSString*)value;
 -(int)getInt:(NSString*)value;
+-(NSMutableArray *)getArray:(NSString *)value;
 -(void)setStringValue:(NSString*)value name:(NSString *)key;
 -(void)setIntValue:(int)value name:(NSString *)key;
+-(void)setArrayValue:(NSMutableArray *)value name:(NSString *)key;
 -(void)save;
 -(void)load;
 -(void)logSettings;

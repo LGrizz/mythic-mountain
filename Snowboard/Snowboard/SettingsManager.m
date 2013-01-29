@@ -12,6 +12,11 @@
 
 static SettingsManager* _sharedSettingsManager = nil;
 
+-(NSMutableArray *)getArray:(NSString*)value
+{
+	return [settings objectForKey:value];
+}
+
 -(NSString *)getString:(NSString*)value
 {
 	return [settings objectForKey:value];
@@ -27,6 +32,10 @@ static SettingsManager* _sharedSettingsManager = nil;
 
 -(void)setIntValue:(int)value name:(NSString *)key{
 	[settings setObject:[NSString stringWithFormat:@"%i",value] forKey:key];
+}
+
+-(void)setArrayValue:(NSMutableArray *)value name:(NSString *)key{
+    [settings setObject:value forKey:key];
 }
 
 -(void)save

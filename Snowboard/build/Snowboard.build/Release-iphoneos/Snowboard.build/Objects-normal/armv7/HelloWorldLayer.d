@@ -90,4 +90,7 @@ dependencies: \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/libs/CocosDenshion/CDOpenALSupport.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/MainMenuScene.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsManager.h \
-  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/StoreScene.h
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/StoreScene.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/CCScrollLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/OpaqueLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/MoveSineAction.h

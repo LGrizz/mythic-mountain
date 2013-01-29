@@ -10,8 +10,14 @@
 #import "HelloWorldLayer.h"
 #import "SettingsManager.h"
 #import "StoreScene.h"
+#import "AboutLayer.h"
+#import "ControlsLayer.h"
+#import "SettingsLayer.h"
+#import "StoryLayer.h"
 
-@implementation MainMenuScene
+@implementation MainMenuScene{
+    CCMenu *mainmenu;
+}
 
 +(id) scene
 {
@@ -30,52 +36,38 @@
     if( (self=[super init] )) {
         CGSize winSize = [CCDirector sharedDirector].winSize;
         
-        CCSprite *top = [CCSprite spriteWithFile:@"static_bg.png"];
-        [top setPosition:ccp(winSize.width/2, winSize.height - top.contentSize.height/2)];
-        [self addChild:top];
-        
-        CCSprite *bg = [CCSprite spriteWithFile:@"hill1.png"];
-        bg.anchorPoint = ccp(0.5f,1.0f);
-        [bg setPosition:ccp(winSize.width/2, winSize.height-161)];
+        CCSprite *bg = [CCSprite spriteWithFile:@"start_bg.png"];
+        bg.anchorPoint = ccp(0.0f,1.0f);
+        [bg setPosition:ccp(0, winSize.height)];
         [self addChild:bg];
-        
-        CCLabelTTF *title = [CCLabelBMFont labelWithString:@"Main Menu" fntFile:@"game_over_menu28pt.fnt"];
-        title.position =  ccp(winSize.width/2, winSize.height-50);
-        [self addChild: title];
         
         CCLayer *menuLayer = [[CCLayer alloc] init];
         [self addChild:menuLayer];
         
-        CCLabelTTF *go = [CCLabelBMFont labelWithString:@"Play" fntFile:@"game_over_dist_coins16pt.fnt"];
-        CCLabelTTF *about = [CCLabelBMFont labelWithString:@"About" fntFile:@"game_over_dist_coins16pt.fnt"];
-        CCLabelTTF *store = [CCLabelBMFont labelWithString:@"Store" fntFile:@"game_over_dist_coins16pt.fnt"];
-        CCLabelTTF *leaderboard = [CCLabelBMFont labelWithString:@"Leaderboard" fntFile:@"game_over_dist_coins16pt.fnt"];
-        CCLabelTTF *achievements = [CCLabelBMFont labelWithString:@"Achievements" fntFile:@"game_over_dist_coins16pt.fnt"];
+        CCLabelTTF *go = [CCLabelBMFont labelWithString:@"PLAY" fntFile:@"main_uni24pt_white.fnt"];
+        CCLabelTTF *store = [CCLabelBMFont labelWithString:@"STORE" fntFile:@"main_uni24pt_white.fnt"];
+        CCLabelTTF *about = [CCLabelBMFont labelWithString:@"LEGEND" fntFile:@"main_uni24pt_white.fnt"];
+        CCLabelTTF *leaderboard = [CCLabelBMFont labelWithString:@"GAMECENTER" fntFile:@"main_uni24pt_white.fnt"];
+        CCLabelTTF *settings = [CCLabelBMFont labelWithString:@"SETTINGS" fntFile:@"main_uni24pt_white.fnt"];
+        CCLabelTTF *control = [CCLabelBMFont labelWithString:@"CONTROLS" fntFile:@"main_uni24pt_white.fnt"];
         CCMenuItemLabel *startButton = [CCMenuItemLabel itemWithLabel:go target:self selector:@selector(startGame:)];
-        CCMenuItemLabel *aboutButton = [CCMenuItemLabel itemWithLabel:about target:self selector:@selector(startGame:)];
+        CCMenuItemLabel *aboutButton = [CCMenuItemLabel itemWithLabel:about target:self selector:@selector(showAbout:)];
         CCMenuItemLabel *storeButton = [CCMenuItemLabel itemWithLabel:store target:self selector:@selector(showStore:)];
         CCMenuItemLabel *leaderButton = [CCMenuItemLabel itemWithLabel:leaderboard target:self selector:@selector(showLeaderboard:)];
-        CCMenuItemLabel *achievementsButton = [CCMenuItemLabel itemWithLabel:achievements target:self selector:@selector(showAchievements:)];
+        CCMenuItemLabel *settingsButton = [CCMenuItemLabel itemWithLabel:settings target:self selector:@selector(showSettings:)];
+        CCMenuItemLabel *controlButton = [CCMenuItemLabel itemWithLabel:control target:self selector:@selector(showControls:)];
+        
+        mainmenu = [CCMenu menuWithItems: startButton, aboutButton, storeButton, leaderButton, settingsButton, controlButton, nil];
+        [mainmenu alignItemsVerticallyWithPadding:5.0f];
+        mainmenu.position = ccp(winSize.width/2, winSize.height - 320);
+        [menuLayer addChild: mainmenu];
+        
+        CCParticleSystemQuad *snowEffect = [CCParticleSystemQuad particleWithFile:@"snow1.plist"];
+        snowEffect.position = ccp(winSize.width/2, winSize.height + 10);
 
-        CCSprite *coinUI = [CCSprite spriteWithFile:@"coinUI.png"];
-        coinUI.position = ccp(winSize.width - 20, winSize.height - 30);
-        [self addChild:coinUI z:999];
+        [self addChild:snowEffect z:999];
         
-        int totalCoins = [[SettingsManager sharedSettingsManager] getInt:@"coins"];
-        CCLabelTTF *coinScoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%i", totalCoins] fntFile:@"coin_24pt.fnt"];
-        coinScoreLabel.anchorPoint = ccp(1.0f,0.5f);
-        coinScoreLabel.position = ccp(winSize.width - 35, winSize.height - 33);
         
-        [self addChild:coinScoreLabel z:999];
-        
-        CCMenu *menu = [CCMenu menuWithItems: startButton, aboutButton, storeButton, leaderButton, achievementsButton, nil];
-        [menu alignItemsVerticallyWithPadding:10.0f];
-        menu.position = ccp(winSize.width/2, winSize.height/2-20);
-        [menuLayer addChild: menu];
-        
-        CCParticleSystemQuad *snowEffect = [CCParticleSystemQuad particleWithFile:@"snow.plist"];
-
-       // [self addChild:snowEffect z:999];
     }
     return self;
 }
@@ -86,14 +78,56 @@
     [[GameKitHelper sharedGameKitHelper] authenticateLocalPlayer];
 }
 
+-(void)onExit{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super onExit];
+}
+
 - (void) startGame: (id) sender
 {
     
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
+    //[[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
+    
+    StoryLayer *story = [[StoryLayer alloc] init];
+    
+    [self addChild:story z:999];
+    
+    self.isTouchEnabled = NO;
+    mainmenu.isTouchEnabled = NO;
 }
 
 - (void)showLeaderboard: (id)sender{
     [[GameKitHelper sharedGameKitHelper] showLeaderboard];
+}
+
+- (void)showAbout: (id)sender{
+    AboutLayer *about = [[AboutLayer alloc] init];
+    
+    [self addChild:about z:999];
+    
+    self.isTouchEnabled = NO;
+    mainmenu.isTouchEnabled = NO;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideStore) name:@"hideAbout" object:nil];
+}
+
+- (void)showControls: (id)sender{
+    ControlsLayer *control = [[ControlsLayer alloc] init];
+    
+    [self addChild:control z:999];
+    
+    self.isTouchEnabled = NO;
+    mainmenu.isTouchEnabled = NO;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideStore) name:@"hideControls" object:nil];
+}
+
+- (void)showSettings: (id)sender{
+    SettingsLayer *settings = [[SettingsLayer alloc] init];
+    
+    [self addChild:settings z:999];
+    
+    self.isTouchEnabled = NO;
+    mainmenu.isTouchEnabled = NO;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideStore) name:@"hideSettings" object:nil];
 }
 
 - (void)showAchievements: (id)sender{
@@ -101,7 +135,24 @@
 }
 
 -(void)showStore: (id)sender{
-    [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[StoreScene scene]]];
+    CGSize winSize = [CCDirector sharedDirector].winSize;
+    StoreScene *store = [[StoreScene alloc] init];
+    
+    store.position = ccp(0, -winSize.height);
+    [self addChild:store z:999];
+    
+    self.isTouchEnabled = NO;
+    
+    mainmenu.isTouchEnabled = NO;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideStore) name:@"hideStore" object:nil];
+}
+
+-(void)hideStore{
+    mainmenu.isTouchEnabled = YES;
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideAbout" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideStore" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideControls" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"hideSettings" object:nil];
 }
 
 - (void) dealloc

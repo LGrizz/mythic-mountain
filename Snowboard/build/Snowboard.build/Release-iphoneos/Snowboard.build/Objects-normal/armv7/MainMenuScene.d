@@ -84,4 +84,10 @@ dependencies: \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/PauseLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/GameOverLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsManager.h \
-  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/StoreScene.h
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/StoreScene.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/CCScrollLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/OpaqueLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/AboutLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/ControlsLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/StoryLayer.h
