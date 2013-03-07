@@ -17,6 +17,7 @@
 #import "StoreScene.h"
 #import "PauseLayer.h"
 #import "MoveSineAction.h"
+#import "Flurry.h"
 
 #define kNumTrees 30
 #define kNumRocks 5
@@ -87,6 +88,14 @@
         }
         
         characterName = [[SettingsManager sharedSettingsManager] getString:@"character"];
+        
+        NSDictionary *purchaseParams =
+        [NSDictionary dictionaryWithObjectsAndKeys:
+         @"Character", characterName, // Capture user status
+         @"Item", equipmentName,
+         nil];
+        
+        [Flurry logEvent:@"Game Start Selections" withParameters:purchaseParams];
                 
         hitTime = NO;
         fallen = NO;
@@ -134,8 +143,8 @@
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_punch.plist"];
         CCSpriteBatchNode *punchSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_punch.png"];
         [self addChild:punchSheet];
-        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_cage.plist"];
-        CCSpriteBatchNode *cageSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_cage.png"];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:[NSString stringWithFormat:@"%@_cage.plist", characterName]];
+        CCSpriteBatchNode *cageSheet = [CCSpriteBatchNode batchNodeWithFile:[NSString stringWithFormat:@"%@_cage.png", characterName]];
         [self addChild:cageSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"yeti_running.plist"];
         CCSpriteBatchNode *yetiRunningSheet = [CCSpriteBatchNode batchNodeWithFile:@"yeti_running.png"];
@@ -143,6 +152,9 @@
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"unicorn_running.plist"];
         CCSpriteBatchNode *unicornRunningSheet = [CCSpriteBatchNode batchNodeWithFile:@"unicorn_running.png"];
         [self addChild:unicornRunningSheet];
+        [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"mermaid_running.plist"];
+        CCSpriteBatchNode *mermaidRunningSheet = [CCSpriteBatchNode batchNodeWithFile:@"mermaid_running.png"];
+        [self addChild:mermaidRunningSheet];
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"leprun.plist"];
         CCSpriteBatchNode *leprunSheet = [CCSpriteBatchNode batchNodeWithFile:@"leprun.png"];
         [self addChild:leprunSheet];
@@ -236,8 +248,22 @@
         [dropShadowSprite setPosition:ccp(_man.position.x, _man.position.y)];
         [self addChild:dropShadowSprite z:899];
         
-        dummy1 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", @"unicorn"]];  // 4
-        dummy2 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", characterName]];
+        NSString *dummyName1;
+        NSString *dummyName2;
+        
+        if([[[SettingsManager sharedSettingsManager] getString:@"character"] isEqualToString:@"yeti"]){
+            dummyName1 = @"unicorn";
+            dummyName2 = @"mermaid";
+        }else if([[[SettingsManager sharedSettingsManager] getString:@"character"] isEqualToString:@"unicorn"]){
+            dummyName1 = @"yeti";
+            dummyName2 = @"mermaid";
+        }else if([[[SettingsManager sharedSettingsManager] getString:@"character"] isEqualToString:@"mermaid"]){
+            dummyName1 = @"unicorn";
+            dummyName2 = @"yeti";
+        }
+        
+        dummy1 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", dummyName1]];  // 4
+        dummy2 = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@Turning01.png", dummyName2]];
         dummy3 = [CCSprite spriteWithFile:@"leprachanRunning1.png"];
         dummy1.position = ccp(100, winSize.height - 190);
         dummy2.position = ccp(100, winSize.height - 190);
@@ -261,7 +287,7 @@
         for(int i = 1; i <= 2; ++i) {
             [yetiRunArray addObject:
              [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-              [NSString stringWithFormat:@"yetiRunning%d.png", i]]];
+              [NSString stringWithFormat:@"%@Running%d.png", dummyName1, i]]];
         }
         
         CCAnimation *yetiRun = [CCAnimation animationWithFrames:yetiRunArray delay:0.2f];
@@ -271,7 +297,7 @@
         for(int i = 1; i <= 2; ++i) {
             [uniRunArray addObject:
              [[CCSpriteFrameCache sharedSpriteFrameCache] spriteFrameByName:
-              [NSString stringWithFormat:@"unicornRunning%d.png", i]]];
+              [NSString stringWithFormat:@"%@Running%d.png", dummyName2, i]]];
         }
         
         CCAnimation *uniRun = [CCAnimation animationWithFrames:uniRunArray delay:0.2f];
@@ -308,6 +334,8 @@
             equipment = [CCSprite spriteWithFile:[NSString stringWithFormat:@"%@%@", equipmentName, @".png"]];
             equipment.position = ccp(_man.position.x + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"x"] intValue], _man.position.y + [[[equipmentDic objectForKey:equipmentName] objectForKey:@"y"] intValue]);
             equipment.anchorPoint = ccp(([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorX"] floatValue]), ([(NSNumber *)[[equipmentDic objectForKey:equipmentName] objectForKey:@"anchorY"] floatValue]));
+            equipment.scale = 0;
+            equipment.opacity = 0;
         }else{
             equipment = [CCSprite spriteWithFile:@"excalibur.png"];
             equipment.position = ccp(_man.position.x + [[[equipmentDic objectForKey:@"excalibur"] objectForKey:@"x"] intValue], _man.position.y + [[[equipmentDic objectForKey:@"excalibur"] objectForKey:@"y"] intValue]);
@@ -382,7 +410,7 @@
         bg.anchorPoint = ccp(0.5f,1.0f);
         [bg setPosition:ccp(winSize.width/2, winSize.height-161)];
         
-        CCSprite *top = [CCSprite spriteWithFile:@"static_bg.png"];
+        CCSprite *top = [CCSprite spriteWithFile:@"sky_bg.png"];
         [top setPosition:ccp(winSize.width/2, winSize.height - top.contentSize.height/2)];
         
         mtnTop = [CCSprite spriteWithFile:@"mountainAnimation_1.png"];
@@ -496,6 +524,8 @@
             trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail4.plist"];
         if([characterName isEqualToString:@"unicorn"])
             trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail6.plist"];
+        if([characterName isEqualToString:@"mermaid"])
+            trail = [ARCH_OPTIMAL_PARTICLE_SYSTEM particleWithFile:@"trail7.plist"];
         trail.positionType=kCCPositionTypeFree;
 		trail.position=ccp(_man.position.x, _man.position.y-10);
         
@@ -506,13 +536,13 @@
         scoreTime = 0;
         coinScore = 0;
         
-        CCLabelTTF *scoreDistanceLabel = [CCLabelBMFont labelWithString:@"y" fntFile:@"distance_24pt.fnt"];
-        scoreDistanceLabel.position = ccp(winSize.width-18, 25);
+        CCSprite *scoreDistanceLabel = [CCSprite spriteWithFile:@"yd.png"];
+        scoreDistanceLabel.position = ccp(winSize.width-25, 23);
         [self addChild:scoreDistanceLabel z:998];
         
         scoreLabel = [CCLabelBMFont labelWithString:[NSString stringWithFormat:@"%d", 0] fntFile:@"distance_24pt.fnt"];
         scoreLabel.anchorPoint = ccp(1.0f,0.5f);
-        scoreLabel.position = ccp(winSize.width-30, 25);
+        scoreLabel.position = ccp(winSize.width-45, 25);
         
         [self addChild:scoreLabel z:998];
         
@@ -531,8 +561,8 @@
         
         [self addChild:coinScoreLabel z:998];
         
-        getUpMessage = [CCLabelBMFont labelWithString:@"Tap! Tap! Tap!" fntFile:@"prompts_uni32.fnt" width:100 alignment:UITextAlignmentCenter];
-        getUpMessage.position = ccp(winSize.width/2, winSize.height - 360);
+        getUpMessage = [CCLabelBMFont labelWithString:@"TAP! TAP! TAP!" fntFile:@"prompts_uni32.fnt" width:100 alignment:UITextAlignmentCenter];
+        getUpMessage.position = ccp(winSize.width/2, winSize.height - 410);
         getUpMessage.anchorPoint = ccp(0.5f,0.5f);
         getUpMessage.scale = 0;
         [self addChild:getUpMessage z:998];
@@ -590,7 +620,11 @@
             [pheonix runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:pheonixFly restoreOriginalFrame:NO]]];
             [[SettingsManager sharedSettingsManager] setStringValue:@"none" name:@"powerup"];
             [[SettingsManager sharedSettingsManager] save];
+            
         }
+        if([[[SettingsManager sharedSettingsManager] getString:@"audio"] isEqualToString:@"on"]){
+        [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"gameplay_audio.mp3" loop:YES];
+            [SimpleAudioEngine sharedEngine].backgroundMusicVolume = .5;}
     }
     return self;
 }
@@ -625,6 +659,7 @@
         pauseLayer = [[PauseLayer alloc] init];
         [self addChild:pauseLayer z:998];
         [self unschedule:@selector(updateTimer)];
+        [self unschedule:@selector(playChop)];
         [mtnTop stopAllActions];
     }
 }
@@ -658,6 +693,9 @@
             heli.position = ccp(heli.position.x, heli.position.y + .5);
             ladder.position = ccp(ladder.position.x, ladder.position.y + .5);
             trapper.position = ccp(trapper.position.x, trapper.position.y + .5);
+            [self schedule:@selector(playChop) interval:.2];
+        }else{
+            [self unschedule:@selector(playChop)];
         }
     
     float newX = _man.position.x + (_shipPointsPerSecY * dt);
@@ -725,6 +763,10 @@
             [trail stopSystem];
             timer = 2000;
             scoreFlipper = 4;
+            if(_man.position.y - 1 == jumpOrigin)
+                if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+                    [[SimpleAudioEngine sharedEngine] playEffect:@"griffin.mp3"];
+            [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsWinging percentComplete:100.0];
         }else{
             griffin.position = ccp(newX - 10, griffin.position.y - 2);
             _man.position = ccp(newX, jumpOrigin);
@@ -1029,7 +1071,7 @@
                 break;
         }
         if(firstCliff){
-            jumpMessage.position = ccp(winSize.width/2, -750);
+            jumpMessage.position = ccp(winSize.width/2, -850);
             jumpMessage.visible = YES;
             [self reorderChild:jumpMessage z:999];
             firstCliff = NO;
@@ -1047,6 +1089,7 @@
     CGRect hillEqupRect = CGRectMake(hillEquipment.boundingBox.origin.x, hillEquipment.boundingBox.origin.y, hillEquipment.boundingBox.size.width, hillEquipment.boundingBox.size.height);
     
     if (CGRectIntersectsRect(shiprect, cliffRect) && _man.position.y == jumpOrigin && cliff.zOrder > 490) {
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
         [[SimpleAudioEngine sharedEngine] playEffect:@"hitjump.wav"];
         if(!jumping && _man.position.y == jumpOrigin){
             //[[SimpleAudioEngine sharedEngine] playEffect:@"bigJump.wav"];
@@ -1067,6 +1110,7 @@
     }
         
     if (CGRectIntersectsRect(shiprect, bigCliffRect) && _man.position.y == jumpOrigin && bigCliff.zOrder > 490) {
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
         [[SimpleAudioEngine sharedEngine] playEffect:@"hitjump.wav"];
         if(!jumping && _man.position.y == jumpOrigin){
             jumping = YES;
@@ -1092,6 +1136,8 @@
         
     if(bigCliff.position.y > winSize.height-160 && bigCliff.zOrder > 490){
         [self reorderChild:bigCliff z:490];
+        if(!tricker)
+            bigJump = NO;
         bigCliff.position = ccpSub(bigCliff.position, ccpMult(asteroidScrollVelDown, dt));
     }else if(bigCliff.zOrder == 490){
         bigCliff.position = ccpSub(bigCliff.position, ccpMult(asteroidScrollVelDown, dt));
@@ -1122,6 +1168,7 @@
         CGRect asteroidRect = CGRectMake(coin.boundingBox.origin.x, coin.boundingBox.origin.y, coin.boundingBox.size.width, coin.boundingBox.size.height);
         
         if (CGRectIntersectsRect(manrect, asteroidRect) && !hitTime && coin.zOrder > 700 && _man.position.y < jumpOrigin + 30) {
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"coin.wav"];
             NSMutableArray *coinArray = [NSMutableArray array];
             for(int i = 1; i <= 5; ++i) {
@@ -1166,6 +1213,7 @@
         CGRect asteroidRect = CGRectMake(tree.boundingBox.origin.x + tree.boundingBox.size.width - 20, tree.boundingBox.origin.y, 5, 20);
         
         if (CGRectIntersectsRect(shiprect, asteroidRect) && !hitTime && tree.zOrder > 700 && tree.texture == [[CCSprite spriteWithFile:@"tree_break1.png"]texture] && !griffinB) {
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"hit.wav"];
             [self schedule:@selector(hitTime) interval:1];
             hitTime = YES;
@@ -1193,6 +1241,7 @@
             fall.position=ccp(_man.position.x, _man.position.y-20);
             [self addChild:fall z:899];
             [self reorderChild:tree z:700];
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
             [getUpMessage runAction:[CCScaleTo actionWithDuration:.5 scale:1]];
             [getUpMessage runAction:[CCRepeatForever actionWithAction:[CCSequence actions:[CCFadeTo actionWithDuration:.3 opacity:100], [CCDelayTime actionWithDuration:.2],[CCFadeTo actionWithDuration:.3 opacity:255], nil]]];
@@ -1238,9 +1287,10 @@
     
     for (CCSprite *rock in _rocks) {
         if (!rock.visible) continue;
-        CGRect rockRect = CGRectMake(rock.position.x, rock.position.y, 1, 1);
+        CGRect rockRect = CGRectMake(rock.position.x, rock.position.y + 5, 1, 1);
         
         if (CGRectIntersectsRect(boardrect, rockRect) && _man.position.y == jumpOrigin && rock.zOrder>700 && rock.texture == [[CCSprite spriteWithFile:@"rock.png"] texture]) {
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
             [_board stopAllActions];
             [_man stopAllActions];
@@ -1304,6 +1354,7 @@
         }
         
         if (CGRectIntersectsRect(equipRect, rockRectCliff) && !hitTime && rock.zOrder > 700 && !equipActionDone) {
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"explode.wav"];
             NSMutableArray *explodeArray = [NSMutableArray array];
             for(int i = 1; i <= 6; ++i) {
@@ -1356,6 +1407,7 @@
         CGRect spikeRect = CGRectMake(spike.position.x, spike.position.y, 1, 1);
     
         if (CGRectIntersectsRect(boardrect, spikeRect) && _man.position.y == jumpOrigin && spike.zOrder > 700 && spike.texture == [[CCSprite spriteWithFile:@"spikes.png"] texture]) {
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"falling.wav"];
             [_board stopAllActions];
             [_man stopAllActions];
@@ -1409,6 +1461,7 @@
         }
         
         if (CGRectIntersectsRect(equipRect, spikeRectCliff) && !hitTime && spike.zOrder > 700 && !equipActionDone) {
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
             [[SimpleAudioEngine sharedEngine] playEffect:@"explode.wav"];
             NSMutableArray *explodeArray = [NSMutableArray array];
             for(int i = 1; i <= 6; ++i) {
@@ -1499,7 +1552,7 @@
             }
             
             CGRect archLeftRect = CGRectMake(arch.boundingBox.origin.x + 30, arch.boundingBox.origin.y, 5, 30);
-            CGRect archRightRect = CGRectMake(arch.boundingBox.origin.x + arch.boundingBox.size.width - 35, arch.boundingBox.origin.y, 5, 30);
+            CGRect archRightRect = CGRectMake(arch.boundingBox.origin.x + arch.boundingBox.size.width - 30, arch.boundingBox.origin.y, 5, 30);
             
             if ((CGRectIntersectsRect(shiprect, archLeftRect) || CGRectIntersectsRect(shiprect, archRightRect)) && !hitTime && arch.zOrder > 700) {
                 //[self unscheduleUpdate];
@@ -1626,16 +1679,11 @@
             speedX = 1.2;
         }
         if(!caught){
-            
+            [self schedule:@selector(playChop) interval:.2];
             CGRect trapperBound = CGRectMake(trapper.position.x, trapper.position.y, trapper.boundingBox.size.width, trapper.boundingBox.size.height);
             CGRect manBound = CGRectMake(_man.position.x, _man.position.y, _man.boundingBox.size.width, _man.boundingBox.size.height);
             
             if(CGRectIntersectsRect(manBound, trapperBound) && trapper.position.y >= _man.position.y - 5 && trapper.position.y <= _man.position.y + 5  && trapper.position.x <= _man.position.x + 30  && trapper.position.x >= _man.position.x + 20){
-                caught = YES;
-                deadSpeed = 1.4;
-                [self removeGestureRecognizer:singleTap];
-                [self removeGestureRecognizer:horzRecognizer];
-
                 if(pheonixB){
                     pheonix.position = ccp(_man.position.x, _man.position.y);
                     //[self addChild:pheonix z:902];
@@ -1652,7 +1700,7 @@
                     pheonixAni.anchorPoint = ccp(0.5f, 0.5f);
                     pheonixAni.position = ccp(winSize.width/2, winSize.height/2);
                     [self addChild:pheonixAni z:999];
-                    [pheonixAni runAction:[CCSequence actions:[CCAnimate actionWithAnimation:pheonixLighting restoreOriginalFrame:YES], [CCFadeOut actionWithDuration:.2], nil]];
+                    [pheonixAni runAction:[CCSequence actions:[CCAnimate actionWithAnimation:pheonixLighting restoreOriginalFrame:YES], [CCFadeOut actionWithDuration:.2], [CCCallBlock actionWithBlock:^{[self reorderChild:dummy3 z:899];}], nil]];
                     dead = NO;
                     caught = NO;
                     pheonixB = NO;
@@ -1660,6 +1708,14 @@
                     trapper.position = ccp(winSize.width/2 + 30, winSize.height + 38);
                     ladder.position = ccp(winSize.width/2 + 40, winSize.height + 95);
                     heli.position = ccp(winSize.width/2, winSize.height + 140);
+                    if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+                    [[SimpleAudioEngine sharedEngine] playEffect:@"pheonix.mp3"];
+                    [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsInsurance percentComplete:100.0];
+                }else{
+                    //[self removeGestureRecognizer:singleTap];
+                    //[self removeGestureRecognizer:horzRecognizer];
+                    caught = YES;
+                    deadSpeed = 1.4;
                 }
             }else{
                 speedX = (_man.position.x + 25 - trapper.position.x);
@@ -1679,6 +1735,8 @@
                 [self unschedule:@selector(updateScoreTimer)];
                 [self endScene:kEndReasonLose];
             }else{
+                [self unschedule:@selector(playchop)];
+                [self schedule:@selector(playChop) interval:.17];
                 deadSpeed += .03;
                 heli.position = ccp(heli.position.x - deadSpeed, heli.position.y + deadSpeed);
                 ladder.position = ccp(ladder.position.x  - deadSpeed, ladder.position.y + deadSpeed);
@@ -1731,9 +1789,6 @@
 }
 
 - (void)endScene:(EndReason)endReason {
-    //[self removeGestureRecognizer:singleTap];
-    //[self removeGestureRecognizer:horzRecognizer];
-    
     if (_gameOver) return;
     _gameOver = true;
     
@@ -1747,6 +1802,8 @@
      submitScore:(int64_t)score
      category:kHighScoreLeaderboardCategory];
     
+    [[GameKitHelper sharedGameKitHelper] submitScore:(int64_t)coinScore category:kCoinscoreLeaderboardCategory];
+    
     
     int totalCoins = [[SettingsManager sharedSettingsManager] getInt:@"coins"];
     if(totalCoins != 0){
@@ -1754,10 +1811,15 @@
     }else{
         totalCoins = coinScore;
     }
+    
     [[SettingsManager sharedSettingsManager] setIntValue:totalCoins name:@"coins"];
+    
+    [self unschedule:@selector(playChop)];
+    [self schedule:@selector(removeGes) interval:.5];
 }
 
 -(void)equipTap:(UIGestureRecognizer *)gestureRecognizer{
+    if(!caught){
     CGSize winSize = [CCDirector sharedDirector].winSize;
     CGPoint tapPoint = [gestureRecognizer locationInView:gestureRecognizer.view];
     tapPoint = [[CCDirector sharedDirector] convertToGL:tapPoint];
@@ -1770,9 +1832,9 @@
     if(_started == NO){
         float randAmp = [self randomValueBetween:50 andValue:80];
         float randFreq = [self randomValueBetween:0.01 andValue:0.04];
-        [dummy3 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.2],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy3 z:899];}], [MoveSineAction actionWithDuration:3 length:450 amplitude:randAmp frequency:randFreq]/*[CCMoveTo actionWithDuration:2 position:ccp(randX, -30)]*/, nil]];
-        [dummy1 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.4],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy1 z:900];}],[CCMoveTo actionWithDuration:1.3 position:ccp(winSize.width + 30, dummy1.position.y - 65)], nil]];
-        [dummy2 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.6],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy2 z:900];}],[CCMoveTo actionWithDuration:1.5 position:ccp(winSize.width + 30, dummy2.position.y - 5)], nil]];
+        [dummy3 runAction:[CCSequence actions:[CCCallBlock actionWithBlock:^{[self reorderChild:dummy3 z:899];}], [MoveSineAction actionWithDuration:3.3 length:450 amplitude:randAmp frequency:randFreq]/*[CCMoveTo actionWithDuration:2 position:ccp(randX, -30)]*/, nil]];
+        [dummy1 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.6],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy1 z:900];}],[CCMoveTo actionWithDuration:1.3 position:ccp(winSize.width + 30, dummy1.position.y - 65)], nil]];
+        [dummy2 runAction:[CCSequence actions:[CCDelayTime actionWithDuration:.8],[CCCallBlock actionWithBlock:^{[self reorderChild:dummy2 z:900];}],[CCMoveTo actionWithDuration:1.5 position:ccp(winSize.width + 30, dummy2.position.y - 5)], nil]];
         float randX = [self randomValueBetween:0.0 andValue:winSize.width];
         [self runAction:[CCSequence actions:[CCCallBlock actionWithBlock:^{[self reorderChild:_man z:900];[self reorderChild:_board z:899];}],[CCDelayTime actionWithDuration:5],[CCCallBlock actionWithBlock:^{[self reorderChild:_man z:900];[self reorderChild:_board z:899];}], nil]];
         [self addChild:trail z:899];
@@ -1795,8 +1857,10 @@
         [mtnTop runAction:[CCRepeatForever actionWithAction:[CCAnimate actionWithAnimation:mtnRum restoreOriginalFrame:NO]]];
     }else{
     
-    if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1 && equipment.visible && tapCount == 0 && !icarus){
+    if(!fallen && !caught && _started && equipActionDone && equipment.scale == 1 && equipment.visible && tapCount == 0 && !icarus && !midas){
         if([equipmentName isEqualToString:@"mjolnir"]){
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+                [[SimpleAudioEngine sharedEngine] playEffect:@"mjolnir.mp3"];
             [equipment runAction:[CCRepeat actionWithAction:[CCRotateBy actionWithDuration:.4 angle:360] times:3]];
             CGPoint point = [gestureRecognizer locationInView:gestureRecognizer.view];
             point = [[CCDirector sharedDirector]convertToGL:point];
@@ -1822,6 +1886,8 @@
                 [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsHammertime percentComplete:100.0];
             }
         }else if([equipmentName isEqualToString:@"excalibur"]){
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+            [[SimpleAudioEngine sharedEngine] playEffect:@"excalibur.mp3"];
             equipActionDone = NO;
             id orbitAction = [CCRotateBy actionWithDuration:1 angle:360];
             id cleaner;
@@ -1840,6 +1906,8 @@
             CCSequence *action = [CCSequence actions:orbitAction, cleaner, nil];
             [equipment runAction:action];
         }else if([equipmentName isEqualToString:@"midas"]){
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+            [[SimpleAudioEngine sharedEngine] playEffect:@"midas.mp3"];
             midas = YES;
             id orbitAction = [CCRotateBy actionWithDuration:1 angle:180];
             id scaleAction = [CCScaleBy actionWithDuration:1 scale:2];
@@ -1862,6 +1930,8 @@
             [equipment runAction:action];
             [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsGoldFinger percentComplete:100.0];
         }else if([equipmentName isEqualToString:@"icarus"]){
+            if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+            [[SimpleAudioEngine sharedEngine] playEffect:@"icarus.mp3"];
             jumping = YES;
             icarus = YES;
             ySpeed = 6;
@@ -1906,11 +1976,13 @@
     }
     }
 }
+}
 
 -(void)ccTouchesBegan:(NSSet*)touches withEvent:(UIEvent*)event{
-        if(!jumping && _man.position.y == jumpOrigin && !fallen){
+    if(!jumping && _man.position.y == jumpOrigin && !fallen ){
            
-        }if(fallen && tapCount < 10 && !caught && !dead && ![[CCDirector sharedDirector] isPaused]){
+    }
+     if(fallen && tapCount < 10 && !caught && !dead && !paused){
             tapCount++;
             NSMutableArray *getupArray = [NSMutableArray array];
             for(int i = 1; i <= 3; ++i) {
@@ -1920,7 +1992,7 @@
             }
             CCAnimation *getup = [CCAnimation animationWithFrames:getupArray delay:0.1f];
             [_man runAction:[CCAnimate actionWithAnimation:getup restoreOriginalFrame:NO]];
-        }else if(fallen && tapCount == 10){
+        }else if(fallen && tapCount == 10 && !caught){
             [self getUp];
         }
     
@@ -1929,6 +2001,7 @@
 -(void)swipe{
     if(!jumping && _man.position.y == jumpOrigin && !fallen && ![[CCDirector sharedDirector] isPaused]){
         _man.scale = 1.1;
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
         [[SimpleAudioEngine sharedEngine] playEffect:@"jump.wav"];
         jumping = YES;
         [self schedule:@selector(jumper) interval:.2];
@@ -1944,7 +2017,7 @@
         [_man runAction:[CCRotateBy actionWithDuration:0.55 angle:360]];
         [dropShadowSprite runAction:[CCRotateBy actionWithDuration:0.55 angle:360]];
         
-        if([characterName isEqualToString:@"yeti"]){
+            if([characterName isEqualToString:@"yeti"]){
             [[GameKitHelper sharedGameKitHelper] reportAchievementIdentifier:kAchievementsBigFeat percentComplete:100.0]; 
         }
     }
@@ -2110,7 +2183,20 @@
     [self unschedule:@selector(tapCountReset)];
 }
 
+-(void)playChop{
+    if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+        [[SimpleAudioEngine sharedEngine] playEffect:@"helicopter_1chop.mp3"];
+}
+
+-(void)removeGes{
+    [self removeGestureRecognizer:singleTap];
+    [self removeGestureRecognizer:horzRecognizer];
+    [self unschedule:@selector(removeGes)];
+}
+
+
 -(void)switchEquipment{
+    if(![((NSString *)hillEquipment.userData) isEqualToString:equipmentName]){
     CGSize winSize = [CCDirector sharedDirector].winSize;
     [self removeChild:equipment cleanup:YES];
     NSString *path=[[NSBundle mainBundle] pathForResource:@"equipment" ofType:@"plist"];
@@ -2120,11 +2206,17 @@
     if([((NSString *)hillEquipment.userData) isEqualToString:@"mjolnir"]){
         equipmentName = @"mjolnir";
         equipOne = @"hammer";
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+            [[SimpleAudioEngine sharedEngine] playEffect:@"mjolnir.mp3"];
     }else if([((NSString *)hillEquipment.userData) isEqualToString:@"excalibur"]){
         equipmentName = @"excalibur";
         equipOne = @"sword";
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+            [[SimpleAudioEngine sharedEngine] playEffect:@"excalibur.mp3"];
     }else if([((NSString *)hillEquipment.userData) isEqualToString:@"icarus"]){
         equipmentName = @"icarus";
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"])
+            [[SimpleAudioEngine sharedEngine] playEffect:@"icarus.mp3"];
         equipOne = @"wings";
         [[CCSpriteFrameCache sharedSpriteFrameCache] addSpriteFramesWithFile:@"wings.plist"];
         CCSpriteBatchNode *wingSheet = [CCSpriteBatchNode batchNodeWithFile:@"wings.png"];
@@ -2161,6 +2253,10 @@
     [self reorderChild:lighting z:481];
     CCSequence *lightAction = [CCSequence actions:lightShow, lightClean, nil];
     [lighting runAction:lightAction];
+    equipAction = NO;
+    icarus = NO;
+    midas = NO;
+    }
     
 }
 

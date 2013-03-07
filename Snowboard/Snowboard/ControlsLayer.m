@@ -30,30 +30,30 @@
         [self addChild:header];
         
         CCSprite *tiltIcon = [CCSprite spriteWithFile:@"titl_icon.png"];
-        tiltIcon.position = ccp(winSize.width - 80, winSize.height - 150);
+        tiltIcon.position = ccp(winSize.width - 60, winSize.height - 150);
         [self addChild:tiltIcon];
         
-        CCLabelTTF *tiltText = [CCLabelBMFont labelWithString:@"Tilt to steer." fntFile:@"uni_8_white_no_shadow.fnt"];
+        CCLabelTTF *tiltText = [CCLabelBMFont labelWithString:@"Tilt to steer." fntFile:@"uni_16_thin_white.fnt"];
         tiltText.anchorPoint = ccp(0.0f, 0.5f);
-        tiltText.position = ccp(60, winSize.height - 150);
+        tiltText.position = ccp(40, winSize.height - 150);
         [self addChild:tiltText];
         
         CCSprite *slideIcon = [CCSprite spriteWithFile:@"slide_icon.png"];
-        slideIcon.position = ccp(winSize.width - 80, winSize.height - 230);
+        slideIcon.position = ccp(winSize.width - 60, winSize.height - 230);
         [self addChild:slideIcon];
         
-        CCLabelTTF *swipeText = [CCLabelBMFont labelWithString:@"Swipe up to jump." fntFile:@"uni_8_white_no_shadow.fnt"];
+        CCLabelTTF *swipeText = [CCLabelBMFont labelWithString:@"Swipe up to jump." fntFile:@"uni_16_thin_white.fnt"];
         swipeText.anchorPoint = ccp(0.0f, 0.5f);
-        swipeText.position = ccp(60, winSize.height - 230);
+        swipeText.position = ccp(40, winSize.height - 230);
         [self addChild:swipeText];
         
         CCSprite *tapIcon = [CCSprite spriteWithFile:@"tilt_icon.png"];
-        tapIcon.position = ccp(winSize.width - 80, winSize.height - 310);
+        tapIcon.position = ccp(winSize.width - 60, winSize.height - 310);
         [self addChild:tapIcon];
         
-        CCLabelTTF *tapText = [CCLabelBMFont labelWithString:@"Tap to use equipment." fntFile:@"uni_8_white_no_shadow.fnt"];
+        CCLabelTTF *tapText = [CCLabelBMFont labelWithString:@"Tap to use equipment." fntFile:@"uni_16_thin_white.fnt"];
         tapText.anchorPoint = ccp(0.0f, 0.5f);
-        tapText.position = ccp(60, winSize.height - 310);
+        tapText.position = ccp(40, winSize.height - 310);
         [self addChild:tapText];
         
         [self setOpacityBlank:0];

@@ -22,11 +22,15 @@
 		</data>
 		<key>Default.png</key>
 		<data>
-		CtYiG5WnC5jOzQ9Djd1CjZYVFuk=
+		gZr0N151FZAqzE3IOJjSZ2OzeQQ=
 		</data>
 		<key>Default@2x.png</key>
 		<data>
 		f+chbalD/cg0G6RzsOPbpHUYQAg=
+		</data>
+		<key>Helicopter.wav</key>
+		<data>
+		ITBKqmf5GGrdQE1PVUCQZZnkqyc=
 		</data>
 		<key>Icon-72.png</key>
 		<data>
@@ -56,14 +60,6 @@
 		<data>
 		n57qDP4tZfLD1rCS43W0B4LQjzE=
 		</data>
-		<key>Sprites.plist</key>
-		<data>
-		Qley5XIBPhARiODdb+Di+71Wj2U=
-		</data>
-		<key>Sprites.pvr.ccz</key>
-		<data>
-		/+bNZQifUreuIlzlPKh/hp2DZes=
-		</data>
 		<key>Stars1.plist</key>
 		<data>
 		PKe3WPf2rK9dz1ZacqnBSXdK40g=
@@ -84,33 +80,13 @@
 		<data>
 		Hl9U7SAxQ/8T/UE1wcX+Mb+9c2U=
 		</data>
+		<key>about_legend_txt.png</key>
+		<data>
+		/iAGvHPk6Lkc/1BgMs/MqgFxA7c=
+		</data>
 		<key>avalanche.plist</key>
 		<data>
 		TTPK3q3tp2zg/9NOaSo6wwCKNxw=
-		</data>
-		<key>bg_front_spacedust.png</key>
-		<data>
-		othEFuRebhsfBgg76Ap7vTAMIwY=
-		</data>
-		<key>bg_galaxy.png</key>
-		<data>
-		itOcfR1bmPLzLO1cvqsRYBkZPHk=
-		</data>
-		<key>bg_planetsunrise.png</key>
-		<data>
-		4mlg8IvS5ukQiwtQj+Mv8PhKmoU=
-		</data>
-		<key>bg_spacialanomaly.png</key>
-		<data>
-		XvKogSAXbfgINI5S2Pc4gDv29zU=
-		</data>
-		<key>bg_spacialanomaly2.png</key>
-		<data>
-		ZcC01wViD7us6Dm7mZgj50xBsIk=
-		</data>
-		<key>bluesnow.png</key>
-		<data>
-		J5b6Ac6v2c83NgK7Lt6F6tTWkk0=
 		</data>
 		<key>board_turning01.png</key>
 		<data>
@@ -135,6 +111,14 @@
 		<key>cancel_btn.png</key>
 		<data>
 		yp7bOVeF5gnXgMcHPvJy2jea6vM=
+		</data>
+		<key>cc_13pt_white.fnt</key>
+		<data>
+		HAX6JejT0+15F/bI+eQsMkPYlFs=
+		</data>
+		<key>cc_13pt_white.png</key>
+		<data>
+		CVB6KtoKpfCMWW+vcCo58KuR3rw=
 		</data>
 		<key>cloud1.png</key>
 		<data>
@@ -226,7 +210,7 @@
 		</data>
 		<key>distance_24pt.fnt</key>
 		<data>
-		dZVlC9biATK3FRMpgDYh3plSOTk=
+		Mw4Tw3FN/BPP2Dl1vmM68P3uX7Y=
 		</data>
 		<key>distance_24pt.png</key>
 		<data>
@@ -234,7 +218,7 @@
 		</data>
 		<key>embedded.mobileprovision</key>
 		<data>
-		w/i7kHthb7Q/YLj6YvTX2GbTxhM=
+		+9opVwwX7S0QLYFzTc3GXvuyA0U=
 		</data>
 		<key>equipment.plist</key>
 		<data>
@@ -243,6 +227,10 @@
 		<key>excalibur-store.png</key>
 		<data>
 		ryyfT5WV54I4YHF+ICET692Fjwo=
+		</data>
+		<key>excalibur.mp3</key>
+		<data>
+		tsSPhfgWzaRfNxrOdec5xLjfWVY=
 		</data>
 		<key>excalibur.png</key>
 		<data>
@@ -332,6 +320,10 @@
 		<data>
 		Hfd2p8wLkUerCqpHak/ug1TZjbE=
 		</data>
+		<key>gameover.mp3</key>
+		<data>
+		SQGo/7lx6e3Ku0CT92eCGPVmMDg=
+		</data>
 		<key>gameoverBg.png</key>
 		<data>
 		pwJYCHv5Nqd784WAEuOS2OjqnHk=
@@ -348,9 +340,17 @@
 		<data>
 		F+3UfHRr/MKEZZ5nJqJFfUyXV3U=
 		</data>
+		<key>gameplay_audio.mp3</key>
+		<data>
+		AzwCYypV4nLrPLNEzskPNTyx9EM=
+		</data>
 		<key>get_it_button.png</key>
 		<data>
 		uCBDkiR8qcKer8AvVXC91TJiAiQ=
+		</data>
+		<key>griffin.mp3</key>
+		<data>
+		Lwyf27c3hGs1uBXvJuUVcEO6aAI=
 		</data>
 		<key>griffin1.png</key>
 		<data>
@@ -380,6 +380,14 @@
 		<data>
 		53P02gZE7+nk9asafuFPI7giZO8=
 		</data>
+		<key>helicopter_1chop.mp3</key>
+		<data>
+		Bvu2mmszr4HuIvuy0+Y5KGFhDj0=
+		</data>
+		<key>helicopter_4chops.mp3</key>
+		<data>
+		I6LbA+wqpX5ZKbk+0YUrnVSo5VU=
+		</data>
 		<key>hill1.png</key>
 		<data>
 		zIEtTGOoEmOQX5y52gXM4hE73CE=
@@ -407,6 +415,10 @@
 		<key>iTunesArtwork</key>
 		<data>
 		aUHj5b3DvHdve2xdq/f8Xa45Noo=
+		</data>
+		<key>icarus.mp3</key>
+		<data>
+		mUlJkPcDsgYJBKuArmjqRTmR/Og=
 		</data>
 		<key>icarus.png</key>
 		<data>
@@ -480,6 +492,10 @@
 		<data>
 		fiWh2qRRRQ0E7sH4G5Bjg38vJsM=
 		</data>
+		<key>main_screen_audio.mp3</key>
+		<data>
+		djbFlPq9pSaY4qQrNYYJzAXRpu4=
+		</data>
 		<key>main_uni24pt_white.fnt</key>
 		<data>
 		mHMtquPtEKb/2OKKZAVk3NcP56o=
@@ -487,6 +503,78 @@
 		<key>main_uni24pt_white.png</key>
 		<data>
 		gU7v2exf2fWU721TNzWDzRuUx94=
+		</data>
+		<key>mermaidTurning01.png</key>
+		<data>
+		dLJLllCIErZuQK4GL78DT33UNzY=
+		</data>
+		<key>mermaid_cage.plist</key>
+		<data>
+		mgi3w4RS6n3mzxoS7oLsLHqnrJ4=
+		</data>
+		<key>mermaid_cage.png</key>
+		<data>
+		ScsFO8Xo6Sh43FtFWW7xK/5Nfig=
+		</data>
+		<key>mermaid_cage1.png</key>
+		<data>
+		DA8g3+0ZrS3UBbkcq1/zpgx67mU=
+		</data>
+		<key>mermaid_getup.plist</key>
+		<data>
+		uyYrPjmey+jre/d2lqVHocjAvFM=
+		</data>
+		<key>mermaid_getup.png</key>
+		<data>
+		SLR17RO+b7M+fWemw4pC3IL+2Hs=
+		</data>
+		<key>mermaid_running.plist</key>
+		<data>
+		+S8OqoyFH19jGstXmNN3h0HNqVk=
+		</data>
+		<key>mermaid_running.png</key>
+		<data>
+		Usu34zzEnDv0KvVDdeb8S+RopjU=
+		</data>
+		<key>mermaid_store.png</key>
+		<data>
+		b/FIyWEEJqVYeC1HqnKpBm8ey2c=
+		</data>
+		<key>mermaidfalling.plist</key>
+		<data>
+		gM5YaI/7BOvCktO3HDW6C6u74WM=
+		</data>
+		<key>mermaidfalling.png</key>
+		<data>
+		tMNMTNhk0p15lbdUu4vobRmcFjY=
+		</data>
+		<key>mermaidjumpleft.plist</key>
+		<data>
+		gJigjsHNLCzfSyj6RXIOeWoRA2g=
+		</data>
+		<key>mermaidjumpleft.png</key>
+		<data>
+		iJWLkAOvNEAD/u6BcUG1J7GmX7w=
+		</data>
+		<key>mermaidjumpright.plist</key>
+		<data>
+		N7Z1LoXV1M3T+WhBvdJUpsXxm5I=
+		</data>
+		<key>mermaidjumpright.png</key>
+		<data>
+		qzG7R42qHaMdhDqjreF/cwKHgOc=
+		</data>
+		<key>mermaidturn.plist</key>
+		<data>
+		gnm+l8iOz0po9GhmVwZbT7a0u/c=
+		</data>
+		<key>mermaidturn.png</key>
+		<data>
+		bhDOtND7CcnzbZdCRywlDT222Hs=
+		</data>
+		<key>midas.mp3</key>
+		<data>
+		3/q1GuPbR0CpDeryJL7bA7xNRj8=
 		</data>
 		<key>midas.png</key>
 		<data>
@@ -515,6 +603,10 @@
 		<key>mjolnir-store.png</key>
 		<data>
 		hs2n8FQbg5SNIXlm/bYe/2b1UWM=
+		</data>
+		<key>mjolnir.mp3</key>
+		<data>
+		F1XpeoucIKPv2wd3+smW2H/cdwQ=
 		</data>
 		<key>mjolnir.png</key>
 		<data>
@@ -556,6 +648,14 @@
 		<data>
 		tr9ons0mKQMwD1ughL/oof9e6Tc=
 		</data>
+		<key>mythic_mountain_114.png</key>
+		<data>
+		VZVrbXfhJHRabfsSOgdFmYRqGZk=
+		</data>
+		<key>mythic_mountain_57.png</key>
+		<data>
+		tqZBhbhp6JUkdRaTVH1h6wRtSvo=
+		</data>
 		<key>next_button.png</key>
 		<data>
 		pZWA8f+pBzAU8F02p+goVoT07rI=
@@ -580,17 +680,9 @@
 		<data>
 		lwyJCR4XGsE97IzpiohmvadpcK8=
 		</data>
-		<key>penguin-left.png</key>
+		<key>pheonix.mp3</key>
 		<data>
-		tp+JRJ+Xr4s38u3kTCzC3J4PO9U=
-		</data>
-		<key>penguin-right.png</key>
-		<data>
-		9W09t4p8REIpR9rfTZZfH7PIyq0=
-		</data>
-		<key>penguin.png</key>
-		<data>
-		KhpTUO7NRHcfCznaDrVkh4Rwz7A=
+		OAFL4xNNXJQijgevtRZtFo21VTQ=
 		</data>
 		<key>pheonix1.png</key>
 		<data>
@@ -648,6 +740,10 @@
 		<data>
 		8YS13SnqH4awdrN6ciT91CPMP6g=
 		</data>
+		<key>sky_bg.png</key>
+		<data>
+		AjBpNXp7pti5Vnou/8mlHOp7j3I=
+		</data>
 		<key>slide1.png</key>
 		<data>
 		HzPJ9JWmhPbrw7X/FgflGdY8/ic=
@@ -702,7 +798,7 @@
 		</data>
 		<key>start_bg.png</key>
 		<data>
-		MNQWYtb+SYaC3oXfMsyY+iAAqt8=
+		3VuRADv5hDXIcHHU1gCcYUI20Ao=
 		</data>
 		<key>static_bg.png</key>
 		<data>
@@ -756,6 +852,10 @@
 		<data>
 		ORxXsuZJov3AF6l19uzQhSzHF3Q=
 		</data>
+		<key>trail7.plist</key>
+		<data>
+		m+RVPWv/54F3pxUUqGi6lIon19s=
+		</data>
 		<key>trapper.plist</key>
 		<data>
 		1UWzyFyTLn9KsV9l0UIBidhcvK8=
@@ -796,6 +896,14 @@
 		<data>
 		Ad5puylz0tKA58KzoCY1w/J8A8Y=
 		</data>
+		<key>uni_16_thin_white.fnt</key>
+		<data>
+		0b2ZCcKexHYVHoRCIo/R4spZdUc=
+		</data>
+		<key>uni_16_thin_white.png</key>
+		<data>
+		pNIF8a8MIB9PnmhP+2pq5ACX3FY=
+		</data>
 		<key>uni_16_white_no_shadow.fnt</key>
 		<data>
 		cn78VKZFET2yEhccygsLGhUr3W4=
@@ -811,6 +919,14 @@
 		<key>uni_32_white_no_shadow.png</key>
 		<data>
 		jOqHCgLEyy1KSNq4YGioJ0kVJ5s=
+		</data>
+		<key>uni_8_thin_white.fnt</key>
+		<data>
+		jfs8+yQadnDGHn3PO9fj/7xmjwY=
+		</data>
+		<key>uni_8_thin_white.png</key>
+		<data>
+		oTtApApc5Aj1LdytK46Qy8ZaOvI=
 		</data>
 		<key>uni_8_white_no_shadow.fnt</key>
 		<data>
@@ -831,6 +947,18 @@
 		<key>unicornTurning01.png</key>
 		<data>
 		UMreWpGx2ZIF4AM7FCsueIdpC1I=
+		</data>
+		<key>unicorn_cage.plist</key>
+		<data>
+		cc6IMyibSvAfNIjyDzzBUMFXC44=
+		</data>
+		<key>unicorn_cage.png</key>
+		<data>
+		7c611jobjEe9zAyH6WcEakCgX+0=
+		</data>
+		<key>unicorn_cage1.png</key>
+		<data>
+		JweoKGcQ1rvnAMeRPjgIiALFx2k=
 		</data>
 		<key>unicorn_getup.plist</key>
 		<data>
@@ -886,7 +1014,7 @@
 		</data>
 		<key>uppercut_logo.png</key>
 		<data>
-		mOSsqH4Cz+TPdw8PRHVAg7mVOlA=
+		HWgr+2tKslDiv6+pie7DCJwAJQU=
 		</data>
 		<key>useit_button.png</key>
 		<data>
@@ -903,6 +1031,10 @@
 		<key>wings.png</key>
 		<data>
 		PzaIKq5xXg2AbGo3NhKDd02Dcok=
+		</data>
+		<key>yd.png</key>
+		<data>
+		+ULk3J599xE3coa5/xCmsOeOAjI=
 		</data>
 		<key>yetiTurning01.png</key>
 		<data>

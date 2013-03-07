@@ -12,6 +12,7 @@
 #import "StoreScene.h"
 #import "SettingsManager.h"
 #import "SettingsLayer.h"
+#import "Flurry.h"
 
 
 @implementation PauseLayer{
@@ -123,10 +124,14 @@
     if([[CCDirector sharedDirector] isPaused]){
         [[CCDirector sharedDirector] resume];
     }
+    
+    [Flurry logEvent:@"Restart"];
+    
     [[CCDirector sharedDirector] replaceScene:[CCTransitionCrossFade transitionWithDuration:0.5 scene:[HelloWorldLayer scene]]];
 }
 
 - (void)achievementsTapped:(id)sender {
+    [Flurry logEvent:@"Gamcenter"];
     [[GameKitHelper sharedGameKitHelper] showAchievements];
 }
 
@@ -150,6 +155,7 @@
 }
 
 -(void)showStore: (id)sender{
+    [Flurry logEvent:@"Show Store"];
     if([[CCDirector sharedDirector] isPaused]){
         [[CCDirector sharedDirector] resume];
     }

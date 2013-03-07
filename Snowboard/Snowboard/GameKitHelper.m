@@ -179,4 +179,18 @@
     }
 }
 
+-(void)showGamecenter{
+    GKGameCenterViewController *gameCenterController = [[GKGameCenterViewController alloc] init];
+    if (gameCenterController != nil)
+    {
+        gameCenterController.gameCenterDelegate = self;
+        //gameCenterController.viewState = GKGameCenterViewControllerStateLeaderboards;
+        //gameCenterController.leaderboardTimeScope = GKLeaderboardTimeScopeToday;
+        //gameCenterController.leaderboardCategory = kHighScoreLeaderboardCategory;
+        UIViewController* rootVC = [self getRootViewController];
+        [rootVC presentViewController:gameCenterController animated:YES
+                           completion:nil];
+    }
+}
+
 @end

@@ -87,4 +87,5 @@ dependencies: \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/CCScrollLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/OpaqueLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsManager.h \
-  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsLayer.h
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/SettingsLayer.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/Flurry/Flurry.h

@@ -24,7 +24,7 @@ static MythicMtnIAPHelper * _sharedHelper;
 
 - (id)init {
     
-    NSSet *productIdentifiers = [NSSet setWithObjects: @"coins1", @"coins2", @"coins3", nil];
+    NSSet *productIdentifiers = [NSSet setWithObjects: @"coins1", @"coins2", @"coins4", nil];
     
     if ((self = [super initWithProductIdentifiers:productIdentifiers])) {                
         

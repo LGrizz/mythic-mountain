@@ -122,11 +122,42 @@ NSString *const IAPHelperProductPurchasedNotification = @"IAPHelperProductPurcha
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
+    NSString *eventName = @"purchase";
+    
     for (SKPaymentTransaction * transaction in transactions) {
+        
+        SKProduct *product;
+        if([transaction.payment.productIdentifier isEqualToString:@"coins1"]){
+            product = (SKProduct *)([_products objectAtIndex:0]);
+        }else if([transaction.payment.productIdentifier isEqualToString:@"coins2"]){
+            product = (SKProduct *)([_products objectAtIndex:1]);
+        }else if([transaction.payment.productIdentifier isEqualToString:@"coins4"]){
+            product = (SKProduct *)([_products objectAtIndex:2]);
+        }
+        
+        NSString *currencyCode = [product.priceLocale objectForKey:NSLocaleCurrencyCode];
+        if(nil != product)
+        {
+            // extract transaction product quantity
+            int quantity = transaction.payment.quantity;
+            // extract unit price of the product
+            float unitPrice = [product.price floatValue];
+            // assign revenue generated from the current product
+            float revenue = unitPrice * quantity;
+            // create MAT tracking event item
+            NSDictionary *dictItem = @{ @"item" : product.localizedTitle,
+                                        @"unit_price" : [NSString stringWithFormat:@"%f", unitPrice],
+                                        @"quantity" : [NSString stringWithFormat:@"%d", quantity],
+                                        @"revenue" : [NSString stringWithFormat:@"%f", revenue]
+                                        };
+            NSArray *arrEventItems = @[ dictItem ];
+            BOOL shouldTrackEvent = FALSE;
+        
         switch (transaction.transactionState)
         {
             case SKPaymentTransactionStatePurchased:
                 [self completeTransaction:transaction];
+                shouldTrackEvent = true;
                 break;
             case SKPaymentTransactionStateFailed:
                 [self failedTransaction:transaction];
@@ -135,6 +166,7 @@ NSString *const IAPHelperProductPurchasedNotification = @"IAPHelperProductPurcha
                 [self restoreTransaction:transaction];
             default:
                 break;
+        }
         }
     };
 }

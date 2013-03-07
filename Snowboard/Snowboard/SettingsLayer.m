@@ -7,8 +7,16 @@
 //
 
 #import "SettingsLayer.h"
+#import "SettingsManager.h"
+#import "SimpleAudioEngine.h"
+#import "MainMenuScene.h"
+#import "PauseLayer.h"
+#import "GameOverLayer.h"
 
-@implementation SettingsLayer
+@implementation SettingsLayer{
+    CCMenuItemImage *sfx;
+    CCMenuItemImage *music;
+}
 
 -(id)init{
     if ((self = [super init])) {
@@ -27,14 +35,24 @@
         dialogMenu.position = ccp(winSize.width/2 - 5, winSize.height/2 - 55);
         [self addChild:dialogMenu];
         
+        music = [CCMenuItemImage itemFromNormalImage:@"off_btn_state.png" selectedImage:@"on_btn_state.png" target:self selector:@selector(toggleAudio)];
+        sfx = [CCMenuItemImage itemFromNormalImage:@"off_btn_state.png" selectedImage:@"on_btn_state.png" target:self selector:@selector(toggleSfx)];
         
+        if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"]){
+           [sfx selected];
+        }else{
+           [sfx unselected];
+        }
         
-        CCMenuItemImage *sfx = [CCMenuItemImage itemFromNormalImage:@"off_btn_state.png" selectedImage:@"on_btn_state.png" target:self selector:@selector(close)];
-        CCMenuItemImage *music = [CCMenuItemImage itemFromNormalImage:@"off_btn_state.png" selectedImage:@"on_btn_state.png" target:self selector:@selector(close)];
+        if([[[SettingsManager sharedSettingsManager] getString:@"audio"] isEqualToString:@"on"]){
+            [music selected];
+        }else{
+            [music unselected];
+        }
         
-        CCMenu *menu = [CCMenu menuWithItems:sfx, music, nil];
+        CCMenu *menu = [CCMenu menuWithItems:music, sfx, nil];
         menu.position = ccp(winSize.width/2 + 60, winSize.height/2 + 10);
-        [menu alignItemsVerticallyWithPadding:25];
+        [menu alignItemsVerticallyWithPadding:30];
         [self addChild:menu];
         
         CCLabelTTF *musicText = [CCLabelBMFont labelWithString:@"Audio" fntFile:@"uni_16_white_no_shadow.fnt"];
@@ -74,6 +92,39 @@
         {
             [(id<CCRGBAProtocol>) node setOpacity: opacity];
         }
+    }
+}
+
+-(void)toggleAudio{
+    if([[[SettingsManager sharedSettingsManager] getString:@"audio"] isEqualToString:@"on"]){
+        [[SettingsManager sharedSettingsManager] setStringValue:@"off" name:@"audio"];
+        [music unselected];
+        [[SimpleAudioEngine sharedEngine] stopBackgroundMusic];
+    }else{
+        [[SettingsManager sharedSettingsManager] setStringValue:@"on" name:@"audio"];
+        [music selected];
+        
+        if([self.parent isKindOfClass:[MainMenuScene class]]){
+            [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"main_screen_audio.mp3" loop:YES];
+            [SimpleAudioEngine sharedEngine].backgroundMusicVolume = .7;
+        }else if([self.parent isKindOfClass:[PauseLayer class]]){
+            [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"gameplay_audio.mp3" loop:YES];
+            [SimpleAudioEngine sharedEngine].backgroundMusicVolume = .7;
+        }else if([self.parent isKindOfClass:[GameOverLayer class]]){
+            [[SimpleAudioEngine sharedEngine] playBackgroundMusic:@"gameover.mp3" loop:YES];
+            [SimpleAudioEngine sharedEngine].backgroundMusicVolume = .7;
+        }
+    }
+}
+
+-(void)toggleSfx{
+    if([[[SettingsManager sharedSettingsManager] getString:@"sfx"] isEqualToString:@"on"]){
+        [[SettingsManager sharedSettingsManager] setStringValue:@"off" name:@"sfx"];
+        [sfx unselected];
+        
+    }else{
+        [[SettingsManager sharedSettingsManager] setStringValue:@"on" name:@"sfx"];
+        [sfx selected];
     }
 }
 

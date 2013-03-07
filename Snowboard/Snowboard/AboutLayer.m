@@ -9,7 +9,7 @@
 #import "AboutLayer.h"
 
 @implementation AboutLayer{
-    CCLabelTTF *legendText;
+    CCSprite *legendText;
     CCLayer *creditsLayer;
 }
 
@@ -33,39 +33,50 @@
         CCMenuItemImage *close = [CCMenuItemImage itemFromNormalImage:@"about_controls_close_btn.png" selectedImage:@"about_controls_close_btn.png" target:self selector:@selector(close)];
         
         CCMenu *bottomMenu = [CCMenu menuWithItems:close, nil];
-        bottomMenu.position = ccp(winSize.width/2, winSize.height - 420);
+        bottomMenu.position = ccp(winSize.width/2, winSize.height - 430);
         [self addChild:bottomMenu];
         
-        legendText = [CCLabelBMFont labelWithString:@"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.\n\nNeque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?\n\nQuis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?" fntFile:@"uni_8_white_no_shadow.fnt" width:250 alignment:UITextAlignmentCenter];
+        legendText = [CCSprite spriteWithFile:@"about_legend_txt.png"];
         //legendText.anchorPoint = ccp(0.5, 1.0f);
-        legendText.position = ccp(winSize.width/2, winSize.height - 220);
+        legendText.position = ccp(winSize.width/2 + 5, winSize.height - 245);
         [self addChild:legendText];
         
         creditsLayer = [[CCLayer alloc] init];
         
         CCSprite *decoderLogo = [CCSprite spriteWithFile:@"decoder_logo.png"];
-        decoderLogo.position = ccp(100, winSize.height - 150);
+        decoderLogo.position = ccp(85, winSize.height - 110);
         [creditsLayer addChild:decoderLogo];
         CCLabelTTF *decoderName = [CCLabelBMFont labelWithString:@"DECODER" fntFile:@"uni_8_white_no_shadow.fnt" width:100 alignment:UITextAlignmentCenter];
         //legendText.anchorPoint = ccp(0.5, 1.0f);
-        decoderName.position = ccp(170, winSize.height - 145);
+        decoderName.position = ccp(155, winSize.height - 105);
         [creditsLayer addChild:decoderName];
-        CCLabelTTF *decoderText = [CCLabelBMFont labelWithString:@"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque." fntFile:@"uni_8_white_no_shadow.fnt" width:120 alignment:UITextAlignmentCenter];
+        CCLabelTTF *decoderText = [CCLabelBMFont labelWithString:@"www.decoderhq.com\n\nDecoder is a startup that builds killer apps for mobile devices and tablets. We build our own products and we're interested in working with you." fntFile:@"cc_13pt_white.fnt" width:120 alignment:UITextAlignmentCenter];
         decoderText.anchorPoint = ccp(0.0, 1.0f);
-        decoderText.position = ccp(145, winSize.height - 154);
+        decoderText.position = ccp(128, winSize.height - 108);
         [creditsLayer addChild:decoderText];
         
+        CCLabelTTF *devText = [CCLabelBMFont labelWithString:@"Development: Kyle Langille" fntFile:@"cc_13pt_white.fnt" width:150 alignment:UITextAlignmentCenter];
+        devText.anchorPoint = ccp(0.0, 1.0f);
+        devText.position = ccp(128, winSize.height - 227);
+        [creditsLayer addChild:devText];
+
+        
         CCSprite *upLogo = [CCSprite spriteWithFile:@"uppercut_logo.png"];
-        upLogo.position = ccp(100, winSize.height - 280);
+        upLogo.position = ccp(85, winSize.height - 280);
         [creditsLayer addChild:upLogo];
         CCLabelTTF *upName = [CCLabelBMFont labelWithString:@"UPPERCUT" fntFile:@"uni_8_white_no_shadow.fnt" width:100 alignment:UITextAlignmentCenter];
         //legendText.anchorPoint = ccp(0.5, 1.0f);
-        upName.position = ccp(175, winSize.height - 265);
+        upName.position = ccp(160, winSize.height - 260);
         [creditsLayer addChild:upName];
-        CCLabelTTF *upText = [CCLabelBMFont labelWithString:@"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque." fntFile:@"uni_8_white_no_shadow.fnt" width:120 alignment:UITextAlignmentCenter];
+        CCLabelTTF *upText = [CCLabelBMFont labelWithString:@"www.madebyuppercut.com\n\nUppercut is a creative agency that produces award-winning marketing campaigns, highly acclaimed brands, and successful e-commerce websites." fntFile:@"cc_13pt_white.fnt" width:120 alignment:UITextAlignmentCenter];
         upText.anchorPoint = ccp(0.0, 1.0f);
-        upText.position = ccp(145, winSize.height - 274);
+        upText.position = ccp(128, winSize.height - 225);
         [creditsLayer addChild:upText];
+        
+        CCLabelTTF *artText = [CCLabelBMFont labelWithString:@"Design: Daniel Parry" fntFile:@"cc_13pt_white.fnt" width:150 alignment:UITextAlignmentCenter];
+        artText.anchorPoint = ccp(0.0, 1.0f);
+        artText.position = ccp(128, winSize.height - 382);
+        [creditsLayer addChild:artText];
         
         [self addChild:creditsLayer];
         

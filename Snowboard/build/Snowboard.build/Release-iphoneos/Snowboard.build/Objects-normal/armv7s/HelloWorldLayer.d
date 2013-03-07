@@ -93,4 +93,5 @@ dependencies: \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/StoreScene.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/CCScrollLayer.h \
   /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/OpaqueLayer.h \
-  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/MoveSineAction.h
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/MoveSineAction.h \
+  /Users/Kyle/Documents/work/cocos2d/Slightly-Dusted/Snowboard/Snowboard/Flurry/Flurry.h

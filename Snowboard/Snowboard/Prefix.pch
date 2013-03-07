@@ -16,6 +16,7 @@
 #endif
 
 #define kHighScoreLeaderboardCategory @"HighScores"
+#define kCoinscoreLeaderboardCategory @"coinscore"
 #define kAchievementsTrainingWheels @"trainingwheels"
 #define kAchievementsChumbawumba @"getbackup"
 #define kAchievementsDistanceOne @"distanceone"
@@ -38,3 +39,7 @@
 #define kAchievementsLegendary @"legendary"
 #define kAchievementsBlockbuster @"blockbuster"
 #define kAchievementsHammertime @"hammertime"
+#define kAchievementsAdoption @"adoptionpapers"
+#define kAchievementsNewGear @"happynewgear"
+#define kAchievementsInsurance @"insurancepolicy"
+#define kAchievementsWinging @"wingingit"

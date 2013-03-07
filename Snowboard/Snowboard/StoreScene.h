@@ -23,6 +23,7 @@
     
     CCLayer *unicornLayer;
     CCLayer *yetiLayer;
+    CCLayer *mermaidLayer;
     CCSprite *uniplat;
     
     CCLayer *excaliburLayer;
