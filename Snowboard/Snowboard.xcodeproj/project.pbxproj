@@ -89,7 +89,6 @@
 		271F0F7416C05D59007C60E2 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271F0F7316C05D59007C60E2 /* CoreTelephony.framework */; };
 		271F0F7616C05D65007C60E2 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271F0F7516C05D65007C60E2 /* MobileCoreServices.framework */; };
 		271F0F7816C05D6F007C60E2 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271F0F7716C05D6F007C60E2 /* AdSupport.framework */; };
-		271F0F7B16C069FA007C60E2 /* whitebg.png in Resources */ = {isa = PBXBuildFile; fileRef = 271F0F7A16C069FA007C60E2 /* whitebg.png */; };
 		271F0F7D16C077CC007C60E2 /* uppercut_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 271F0F7C16C077CC007C60E2 /* uppercut_logo.png */; };
 		272BBAF216AF81AD00DB9FC9 /* trail5.plist in Resources */ = {isa = PBXBuildFile; fileRef = 272BBAF116AF81AD00DB9FC9 /* trail5.plist */; };
 		272BBAF516AF859900DB9FC9 /* trail6.plist in Resources */ = {isa = PBXBuildFile; fileRef = 272BBAF416AF859900DB9FC9 /* trail6.plist */; };
@@ -516,8 +515,6 @@
 		271F0F7316C05D59007C60E2 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		271F0F7516C05D65007C60E2 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		271F0F7716C05D6F007C60E2 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
-		271F0F7916C05DA1007C60E2 /* MobileAppTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MobileAppTracker.h; sourceTree = "<group>"; };
-		271F0F7A16C069FA007C60E2 /* whitebg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whitebg.png; sourceTree = "<group>"; };
 		271F0F7C16C077CC007C60E2 /* uppercut_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = uppercut_logo.png; sourceTree = "<group>"; };
 		272BBAF116AF81AD00DB9FC9 /* trail5.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = trail5.plist; sourceTree = "<group>"; };
 		272BBAF416AF859900DB9FC9 /* trail6.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = trail6.plist; sourceTree = "<group>"; };
@@ -1120,7 +1117,6 @@
 		275A4B8D169F76100011CA0D /* TestFlight */ = {
 			isa = PBXGroup;
 			children = (
-				271F0F7916C05DA1007C60E2 /* MobileAppTracker.h */,
 				275A4B8E169F76550011CA0D /* libTestFlight.a */,
 				275A4B8F169F76550011CA0D /* README.md */,
 				275A4B90169F76550011CA0D /* release_notes.md */,
@@ -1327,7 +1323,6 @@
 		27B0D172168A55A50087C612 /* Backgrounds */ = {
 			isa = PBXGroup;
 			children = (
-				271F0F7A16C069FA007C60E2 /* whitebg.png */,
 				271F0F6816C03DE8007C60E2 /* yd.png */,
 				2750843F16B99E41006D2F4B /* sky_bg.png */,
 				2761B24216B34973006DCD50 /* mountainAnimation_1.png */,
@@ -2315,7 +2310,6 @@
 				271F0F6916C03DE8007C60E2 /* yd.png in Resources */,
 				271F0F6B16C042CF007C60E2 /* helicopter_1chop.mp3 in Resources */,
 				271F0F6D16C04380007C60E2 /* helicopter_4chops.mp3 in Resources */,
-				271F0F7B16C069FA007C60E2 /* whitebg.png in Resources */,
 				271F0F7D16C077CC007C60E2 /* uppercut_logo.png in Resources */,
 				27E9C10516DFCA3700191088 /* mythic_mountain72x72.png in Resources */,
 				27E9C10716DFCA3A00191088 /* mythic_mountain144x144.png in Resources */,
